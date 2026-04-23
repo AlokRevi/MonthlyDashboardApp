@@ -1,0 +1,141 @@
+:host {
+  display: block;
+}
+
+.app-shell {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: #2f6fed;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+h1 {
+  margin: 0;
+  font-size: 34px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: end;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 120px;
+}
+
+.field span {
+  font-size: 13px;
+  color: #667085;
+  font-weight: 600;
+}
+
+.field input,
+.field select {
+  height: 42px;
+  border: 1px solid #dbe1ea;
+  border-radius: 10px;
+  padding: 0 12px;
+  background: white;
+}
+
+.primary-btn {
+  height: 42px;
+  border: none;
+  border-radius: 10px;
+  padding: 0 16px;
+  background: #2f6fed;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) minmax(320px, 0.95fr);
+  gap: 22px;
+}
+
+.panel {
+  background: white;
+  border: 1px solid #dbe1ea;
+  border-radius: 18px;
+  box-shadow: 0 10px 24px rgba(16, 24, 40, 0.06);
+}
+
+.dashboard-main {
+  padding: 20px;
+}
+
+.panel-head {
+  margin-bottom: 16px;
+}
+
+.panel-head h2,
+.tasks-panel-head h3 {
+  margin: 0;
+}
+
+.subtext {
+  margin: 4px 0 0;
+  color: #667085;
+  font-size: 14px;
+}
+
+.tasks-panel {
+  background: white;
+  border: 1px solid #dbe1ea;
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.tasks-panel-head {
+  margin-bottom: 16px;
+}
+
+.state-box {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid #dbe1ea;
+  margin-bottom: 16px;
+}
+
+.state-box.error {
+  border-color: #f1b9b9;
+  background: #fff4f4;
+  color: #8a1c1c;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

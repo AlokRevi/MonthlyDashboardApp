@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monthly Dashboard</title>
+    <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+<div class="app-shell">
+    <header class="app-header">
+        <div>
+            <p class="eyebrow">Monthly critical tasks</p>
+            <h1>Monthly Dashboard</h1>
+        </div>
+
+        <div class="toolbar">
+            <label class="field">
+                <span>Year</span>
+                <input type="number" id="yearInput" min="2000" max="2100" />
+            </label>
+
+            <label class="field">
+                <span>Month</span>
+                <select id="monthInput"></select>
+            </label>
+
+            <button id="loadDashboardBtn" class="primary-btn">Load</button>
+        </div>
+    </header>
+
+    <main class="dashboard-layout">
+        <section class="dashboard-main panel">
+            <div class="panel-head">
+                <div>
+                    <h2 id="monthLabel">Month</h2>
+                    <p class="subtext">Fixed monthly timeline with visible occurrences</p>
+                </div>
+            </div>
+
+            <section class="timeline-card">
+                <div class="timeline-row">
+                    <div class="timeline-label">Scale Month</div>
+
+                    <div class="timeline-main">
+                        <div class="current-date-label" id="currentDateLabel">Apr 22</div>
+
+                        <div class="scale-track-wrap">
+                            <div class="scale-track"></div>
+                            <div class="scale-anchors" id="scaleAnchors"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-row">
+                    <div class="timeline-label">Days</div>
+
+                    <div class="day-strip-wrap">
+                        <div class="today-marker" id="todayMarker">
+                            <span class="today-pill" id="todayPill">Today</span>
+                            <span class="today-triangle">▼</span>
+                        </div>
+                        <div class="days-strip" id="daysStrip"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="tasks-panel">
+                <div class="tasks-panel-head">
+                    <h3>Monthly View</h3>
+                </div>
+                <div id="categoriesContainer"></div>
+            </section>
+        </section>
+
+        <aside class="dashboard-side">
+            <section class="panel checklist-panel">
+                <div class="panel-head compact">
+                    <div>
+                        <h2 id="todoTitle">Today Checklist</h2>
+                        <p class="subtext">Today + overdue items</p>
+                    </div>
+                </div>
+
+                <div id="todoList" class="todo-list"></div>
+            </section>
+        </aside>
+    </main>
+</div>
+
+<script src="./app.js"></script>
+</body>
+</html>

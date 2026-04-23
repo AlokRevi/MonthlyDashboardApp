@@ -1,0 +1,34 @@
+<section class="panel checklist-panel">
+    <div class="panel-head compact">
+        <div>
+            <h2>Today Checklist · {{ formattedToday }}</h2>
+            <p class="subtext">Today + overdue items</p>
+        </div>
+    </div>
+
+    <div class="todo-list" *ngIf="viewItems.length; else emptyBlock">
+        <div class="todo-item" *ngFor="let item of viewItems; trackBy: trackByChecklistItem">
+            <div class="todo-top">
+                <div>
+                    <div class="todo-task-name">{{ item.taskName }}</div>
+                    <div class="todo-meta">
+                        {{ item.categoryName }} · Due {{ item.formattedOccurrenceDate }}
+                    </div>
+                </div>
+
+                <div
+                        class="todo-status"
+                        [class.status-due]="item.status === 'DUE_TODAY'"
+                        [class.status-overdue]="item.status === 'OVERDUE'">
+                    {{ item.formattedStatus }}
+                </div>
+            </div>
+
+            <button class="complete-btn" (click)="onMarkComplete(item)">Mark Complete</button>
+        </div>
+    </div>
+
+    <ng-template #emptyBlock>
+        <div class="empty-state">Nothing due today 🎉</div>
+    </ng-template>
+</section>

@@ -1,0 +1,60 @@
+.category-block + .category-block {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #dbe1ea;
+}
+
+.category-title {
+  margin: 0 0 14px;
+  font-size: 18px;
+}
+
+.task-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.task-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 14px;
+  align-items: center;
+}
+
+.task-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #253041;
+}
+
+.occurrence-grid {
+  display: grid;
+  gap: 4px;
+}
+
+.occurrence-cell {
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.occurrence-cell.visible {
+  border: 1px solid #b8c2d1;
+  background: #fff;
+}
+
+.occurrence-cell.completed {
+  background: #ddf5e8;
+  color: #1f7a4d;
+  border-color: #adddbf;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+@media (max-width: 760px) {
+  .task-row {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,49 @@
+<section class="timeline-card">
+    <div class="timeline-row">
+        <div class="timeline-label">Scale Month</div>
+
+        <div class="timeline-main">
+            <div class="current-date-label">{{ scaleBar.currentDateLabel }}</div>
+
+            <div class="scale-track-wrap">
+                <div class="scale-track"></div>
+
+                <div class="scale-anchors">
+                    <div
+                            class="anchor"
+                            *ngFor="let anchor of scaleBar.anchors; trackBy: trackByAnchor"
+                            [style.left.%]="getAnchorLeftPercent(anchor)">
+                        <div class="anchor-line"></div>
+                        <div class="anchor-label">{{ anchor }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="timeline-row">
+        <div class="timeline-label">Days</div>
+
+        <div class="day-strip-wrap">
+            <div
+                    class="today-marker"
+                    *ngIf="todayIndex >= 0"
+                    [style.left.%]="todayLeftPercent">
+                <span class="today-pill">{{ todayLabel }}</span>
+                <span class="today-triangle">▼</span>
+            </div>
+
+            <div
+                    class="days-strip"
+                    [style.grid-template-columns]="'repeat(' + dayStrip.length + ', 1fr)'">
+                <div
+                        *ngFor="let day of dayStrip; trackBy: trackByDate"
+                        class="day-box"
+                        [class.wednesday]="day.weekday === 'WEDNESDAY'"
+                        [class.weekend]="day.isWeekend"
+                        [class.today]="day.isToday">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

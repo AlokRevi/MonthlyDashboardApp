@@ -1,0 +1,22 @@
+<section class="category-block">
+    <h3 class="category-title">{{ category.categoryName }}</h3>
+
+    <div class="task-grid">
+        <div class="task-row" *ngFor="let row of taskRows; trackBy: trackByTaskId">
+            <div class="task-name">{{ row.taskName }}</div>
+
+            <div
+                    class="occurrence-grid"
+                    [style.grid-template-columns]="'repeat(' + totalDays + ', 1fr)'">
+
+                <div
+                        *ngFor="let cell of row.cells; trackBy: trackByDay"
+                        class="occurrence-cell"
+                        [class.visible]="cell.visible"
+                        [class.completed]="cell.completed">
+                    <span *ngIf="cell.completed">X</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
