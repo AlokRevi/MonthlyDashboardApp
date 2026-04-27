@@ -1,0 +1,61 @@
+<section class="category-section">
+  <p class="scroll-hint">Swipe sideways to see all month dates →</p>
+
+  @for (category of sortedCategories; track trackByCategory($index, category)) {
+  <div class="category-block">
+    <h3 class="category-title">{{ category.categoryName }}</h3>
+
+    @for (task of category.tasks; track trackByTask($index, task)) {
+    <div
+      class="task-row"
+      [class.task-row-expanded]="isTaskExpanded(task.taskId)"
+      (click)="toggleTaskActions(task.taskId)">
+
+      <div class="task-info">
+        <strong>{{ task.taskName }}</strong>
+
+        <div class="task-actions">
+          <button
+            type="button"
+            class="edit-task-button"
+            (click)="editTask.emit(task.taskId); $event.stopPropagation()">
+            Edit
+          </button>
+
+          <button
+            type="button"
+            class="delete-task-button"
+            (click)="deleteTask.emit(task.taskId); $event.stopPropagation()">
+            Delete
+          </button>
+        </div>
+      </div>
+
+      <div class="occurrence-grid-wrap">
+        <div class="occurrence-grid">
+          @for (day of dayStrip; track trackByDay($index, day)) {
+          <div class="day-cell">
+            @let occurrence = getOccurrenceForDay(task, day);
+
+            @if (occurrence) {
+            <button
+              type="button"
+              class="occurrence-pill"
+              [class.completed]="occurrence.status === 'COMPLETED'"
+              [class.overdue]="occurrence.status === 'OVERDUE'"
+              [class.due-today]="occurrence.status === 'DUE_TODAY'"
+              [class.upcoming]="occurrence.status === 'UPCOMING'"
+              (click)="onOccurrenceClicked(task, occurrence); $event.stopPropagation()"
+              [title]="occurrence.status + ' - ' + occurrence.occurrenceDate">
+              {{ occurrence.dayOfMonth }}
+            </button>
+            }
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+  }
+</section>

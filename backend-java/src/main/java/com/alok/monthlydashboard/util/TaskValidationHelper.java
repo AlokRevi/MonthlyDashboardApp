@@ -1,7 +1,7 @@
 package com.alok.monthlydashboard.util;
 
-import com.alok.monthlydashboard.dto.task.RecurrenceType;
 import com.alok.monthlydashboard.dto.task.TaskRuleRequest;
+import com.alok.monthlydashboard.common.enums.RecurrenceType;
 import com.alok.monthlydashboard.exception.ValidationException;
 
 import java.util.HashSet;

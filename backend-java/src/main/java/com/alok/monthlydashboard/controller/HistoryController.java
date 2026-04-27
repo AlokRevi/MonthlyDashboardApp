@@ -3,14 +3,10 @@ package com.alok.monthlydashboard.controller;
 import com.alok.monthlydashboard.dto.dashboard.MonthlyDashboardResponse;
 import com.alok.monthlydashboard.dto.history.TaskHistoryResponse;
 import com.alok.monthlydashboard.service.HistoryService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/history")
+@RequestMapping("/api/v1")
 public class HistoryController {
 
     private final HistoryService historyService;
@@ -19,7 +15,7 @@ public class HistoryController {
         this.historyService = historyService;
     }
 
-    @GetMapping("/monthly")
+    @GetMapping("/history/monthly")
     public MonthlyDashboardResponse getPastMonth(
             @RequestParam int year,
             @RequestParam int month
@@ -27,7 +23,7 @@ public class HistoryController {
         return historyService.getPastMonth(year, month);
     }
 
-    @GetMapping("/tasks/{taskId}")
+    @GetMapping("/tasks/{taskId}/history")
     public TaskHistoryResponse getTaskHistory(@PathVariable Long taskId) {
         return historyService.getTaskHistory(taskId);
     }

@@ -1,7 +1,5 @@
 package com.alok.monthlydashboard.dto.dashboard;
-
-import com.alok.monthlydashboard.dto.task.RecurrenceType;
-
+import com.alok.monthlydashboard.common.enums.RecurrenceType;
 import java.util.List;
 
 public record DashboardTaskResponse(

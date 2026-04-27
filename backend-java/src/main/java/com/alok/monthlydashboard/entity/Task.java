@@ -1,6 +1,6 @@
 package com.alok.monthlydashboard.entity;
 
-import com.alok.monthlydashboard.entity.enums.RecurrenceType;
+import com.alok.monthlydashboard.common.enums.RecurrenceType;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -14,10 +14,6 @@ public class Task extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
@@ -53,40 +49,8 @@ public class Task extends BaseEntity {
     @OrderBy("occurrenceDate ASC")
     private List<TaskCompletion> completions = new ArrayList<>();
 
-    public void setRecurrenceRule(TaskRecurrenceRule recurrenceRule) {
-        this.recurrenceRule = recurrenceRule;
-        if (recurrenceRule != null) {
-            recurrenceRule.setTask(this);
-        }
-    }
-
-    public void addFixedDate(TaskFixedDate fixedDate) {
-        this.fixedDates.add(fixedDate);
-        fixedDate.setTask(this);
-    }
-
-    public void clearFixedDates() {
-        for (TaskFixedDate fd : fixedDates) {
-            fd.setTask(null);
-        }
-        fixedDates.clear();
-    }
-
-    public void addCompletion(TaskCompletion completion) {
-        this.completions.add(completion);
-        completion.setTask(this);
-    }
-
     public Long getId() {
         return id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public Category getCategory() {
@@ -149,11 +113,35 @@ public class Task extends BaseEntity {
         return recurrenceRule;
     }
 
+    public void setRecurrenceRule(TaskRecurrenceRule recurrenceRule) {
+        this.recurrenceRule = recurrenceRule;
+        if (recurrenceRule != null) {
+            recurrenceRule.setTask(this);
+        }
+    }
+
     public List<TaskFixedDate> getFixedDates() {
         return fixedDates;
     }
 
+    public void addFixedDate(TaskFixedDate fixedDate) {
+        this.fixedDates.add(fixedDate);
+        fixedDate.setTask(this);
+    }
+
+    public void clearFixedDates() {
+        for (TaskFixedDate fixedDate : fixedDates) {
+            fixedDate.setTask(null);
+        }
+        fixedDates.clear();
+    }
+
     public List<TaskCompletion> getCompletions() {
         return completions;
+    }
+
+    public void addCompletion(TaskCompletion completion) {
+        this.completions.add(completion);
+        completion.setTask(this);
     }
 }

@@ -4,6 +4,7 @@ import com.alok.monthlydashboard.dto.task.*;
 import com.alok.monthlydashboard.entity.Task;
 import com.alok.monthlydashboard.entity.TaskFixedDate;
 import com.alok.monthlydashboard.entity.TaskRecurrenceRule;
+import com.alok.monthlydashboard.common.enums.*;
 
 import java.util.List;
 
@@ -64,7 +65,7 @@ public final class TaskMapper {
         return new TaskRuleRequest(
                 fixedDates,
                 rule.getIntervalValue(),
-                rule.getIntervalUnit() == null ? null : IntervalUnit.valueOf(rule.getIntervalUnit().name()),
+                rule.getIntervalUnit() == null ? null : com.alok.monthlydashboard.common.enums.IntervalUnit.valueOf(rule.getIntervalUnit().name()),
                 rule.getWeekday() == null ? null : Weekday.valueOf(rule.getWeekday().name()),
                 rule.getWeekOfMonth() == null ? null : WeekOfMonth.valueOf(rule.getWeekOfMonth().name()),
                 rule.isFallbackToLastDay()

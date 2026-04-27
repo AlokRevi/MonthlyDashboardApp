@@ -1,13 +1,11 @@
 package com.alok.monthlydashboard.service.impl;
 
-import com.alok.monthlydashboard.dto.checklist.OccurrenceStatus;
 import com.alok.monthlydashboard.dto.dashboard.OccurrenceResponse;
 import com.alok.monthlydashboard.entity.Task;
 import com.alok.monthlydashboard.entity.TaskCompletion;
 import com.alok.monthlydashboard.entity.TaskFixedDate;
 import com.alok.monthlydashboard.entity.TaskRecurrenceRule;
 import com.alok.monthlydashboard.entity.enums.IntervalUnit;
-import com.alok.monthlydashboard.entity.enums.RecurrenceType;
 import com.alok.monthlydashboard.entity.enums.WeekOfMonth;
 import com.alok.monthlydashboard.entity.enums.Weekday;
 import com.alok.monthlydashboard.exception.ResourceNotFoundException;
@@ -15,6 +13,7 @@ import com.alok.monthlydashboard.repository.TaskCompletionRepository;
 import com.alok.monthlydashboard.repository.TaskRepository;
 import com.alok.monthlydashboard.service.RecurrenceService;
 import org.springframework.stereotype.Service;
+import com.alok.monthlydashboard.common.enums.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;

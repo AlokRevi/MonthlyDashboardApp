@@ -1,0 +1,41 @@
+<section class="timeline-card">
+  @if (scaleBar) {
+  <div class="scale-row">
+    <div class="scale-label">Scale Month</div>
+
+    <div class="scale-grid">
+      @for (day of dayStrip; track day.date) {
+      <div class="scale-cell">
+        @if (scaleBar.anchors.includes(day.dayOfMonth)) {
+        <span class="tick"></span>
+        <span class="anchor-label">{{ day.dayOfMonth }}</span>
+        }
+      </div>
+      }
+    </div>
+  </div>
+  }
+
+  <div class="days-row">
+    <div class="days-label">Days</div>
+
+    <div class="day-grid">
+      @for (day of dayStrip; track day.date) {
+      <div
+        class="day-cell"
+        [title]="day.date + ' · ' + day.weekday"
+        [class.today]="day.isToday"
+        [class.saturday]="day.weekday === 'SATURDAY'"
+        [class.sunday]="day.weekday === 'SUNDAY'"
+        [class.wednesday]="day.weekday === 'WEDNESDAY'">
+
+        @if (day.isToday) {
+        <div class="today-label">{{ day.weekday.slice(0, 3) }}</div>
+        }
+
+        {{ day.dayOfMonth }}
+      </div>
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,56 @@
+<section class="today-card">
+  <!-- Header stays compact so the side panel does not become too tall -->
+  <div class="today-header">
+    <div>
+      <h2>Today Checklist</h2>
+
+      @if (checklist) {
+      <p>{{ checklist.items.length }} item(s)</p>
+      }
+    </div>
+  </div>
+
+  @if (checklist && checklist.items.length > 0) {
+  <div class="checklist-list">
+    @for (item of checklist.items; track trackByChecklistItem($index, item)) {
+    <article class="checklist-row">
+      <!-- Left section: task name + category/date info -->
+      <div class="item-main">
+        <div class="item-title-line">
+          <strong>{{ item.taskName }}</strong>
+
+          <span
+            class="status-pill"
+            [class.status-due]="item.status === 'DUE_TODAY'"
+            [class.status-overdue]="item.status === 'OVERDUE'">
+            {{ getStatusLabel(item.status) }}
+          </span>
+        </div>
+
+        <div class="item-meta">
+          <span>{{ item.categoryName }}</span>
+          <span>•</span>
+          <span>{{ item.occurrenceDate }}</span>
+        </div>
+      </div>
+
+      <!-- Right section: compact action button -->
+      <button
+        type="button"
+        class="complete-button"
+        (click)="onMarkComplete(item)">
+        ✓
+      </button>
+    </article>
+    }
+  </div>
+  }
+
+  @if (checklist && checklist.items.length === 0) {
+  <div class="empty-state">
+    <div class="empty-icon">✓</div>
+    <strong>All clear for today</strong>
+    <p>No due or overdue tasks.</p>
+  </div>
+  }
+</section>

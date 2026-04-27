@@ -9,23 +9,9 @@ import java.util.Optional;
 
 public interface TaskCompletionRepository extends JpaRepository<TaskCompletion, Long> {
 
-    Optional<TaskCompletion> findByTaskIdAndOccurrenceDate(Long taskId, LocalDate occurrenceDate);
-
     boolean existsByTaskIdAndOccurrenceDate(Long taskId, LocalDate occurrenceDate);
 
-    void deleteByTaskIdAndOccurrenceDate(Long taskId, LocalDate occurrenceDate);
+    Optional<TaskCompletion> findByTaskIdAndOccurrenceDate(Long taskId, LocalDate occurrenceDate);
 
     List<TaskCompletion> findByTaskIdOrderByOccurrenceDateAsc(Long taskId);
-
-    List<TaskCompletion> findByTaskIdAndOccurrenceDateBetweenOrderByOccurrenceDateAsc(
-            Long taskId,
-            LocalDate start,
-            LocalDate end
-    );
-
-    List<TaskCompletion> findByTaskIdInAndOccurrenceDateBetween(
-            List<Long> taskIds,
-            LocalDate start,
-            LocalDate end
-    );
 }

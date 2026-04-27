@@ -1,11 +1,13 @@
 package com.alok.monthlydashboard.exception;
 
-import com.alok.monthlydashboard.dto.common.ErrorResponse;
-import com.alok.monthlydashboard.dto.common.FieldErrorDetail;
+import com.alok.monthlydashboard.common.ErrorResponse;
+import com.alok.monthlydashboard.common.FieldErrorDetail;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,17 +24,13 @@ public class GlobalExceptionHandler {
             ResourceNotFoundException ex,
             HttpServletRequest request
     ) {
-        ErrorResponse response = new ErrorResponse(
-                Instant.now(),
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
+        return buildError(
+                HttpStatus.NOT_FOUND,
                 "RESOURCE_NOT_FOUND",
                 ex.getMessage(),
                 request.getRequestURI(),
                 List.of()
         );
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(ValidationException.class)
@@ -40,17 +38,13 @@ public class GlobalExceptionHandler {
             ValidationException ex,
             HttpServletRequest request
     ) {
-        ErrorResponse response = new ErrorResponse(
-                Instant.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+        return buildError(
+                HttpStatus.BAD_REQUEST,
                 "BUSINESS_VALIDATION_ERROR",
                 ex.getMessage(),
                 request.getRequestURI(),
                 List.of()
         );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(ConflictException.class)
@@ -58,17 +52,13 @@ public class GlobalExceptionHandler {
             ConflictException ex,
             HttpServletRequest request
     ) {
-        ErrorResponse response = new ErrorResponse(
-                Instant.now(),
-                HttpStatus.CONFLICT.value(),
-                HttpStatus.CONFLICT.getReasonPhrase(),
+        return buildError(
+                HttpStatus.CONFLICT,
                 "CONFLICT",
                 ex.getMessage(),
                 request.getRequestURI(),
                 List.of()
         );
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
     @ExceptionHandler(UnauthorizedOperationException.class)
@@ -76,17 +66,13 @@ public class GlobalExceptionHandler {
             UnauthorizedOperationException ex,
             HttpServletRequest request
     ) {
-        ErrorResponse response = new ErrorResponse(
-                Instant.now(),
-                HttpStatus.FORBIDDEN.value(),
-                HttpStatus.FORBIDDEN.getReasonPhrase(),
+        return buildError(
+                HttpStatus.FORBIDDEN,
                 "FORBIDDEN_OPERATION",
                 ex.getMessage(),
                 request.getRequestURI(),
                 List.of()
         );
-
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -100,17 +86,13 @@ public class GlobalExceptionHandler {
                 .map(this::toFieldErrorDetail)
                 .toList();
 
-        ErrorResponse response = new ErrorResponse(
-                Instant.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+        return buildError(
+                HttpStatus.BAD_REQUEST,
                 "VALIDATION_ERROR",
                 "Request validation failed",
                 request.getRequestURI(),
                 details
         );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -126,17 +108,34 @@ public class GlobalExceptionHandler {
                 ))
                 .toList();
 
-        ErrorResponse response = new ErrorResponse(
-                Instant.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+        return buildError(
+                HttpStatus.BAD_REQUEST,
                 "CONSTRAINT_VIOLATION",
                 "Constraint violation",
                 request.getRequestURI(),
                 details
         );
+    }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(
+            HttpMessageNotReadableException ex,
+            HttpServletRequest request
+    ) {
+        String message = "Malformed request body";
+
+        Throwable cause = ex.getCause();
+        if (cause instanceof UnrecognizedPropertyException unrecognized) {
+            message = "Unknown field: " + unrecognized.getPropertyName();
+        }
+
+        return buildError(
+                HttpStatus.BAD_REQUEST,
+                "VALIDATION_ERROR",
+                message,
+                request.getRequestURI(),
+                List.of()
+        );
     }
 
     @ExceptionHandler(Exception.class)
@@ -144,17 +143,35 @@ public class GlobalExceptionHandler {
             Exception ex,
             HttpServletRequest request
     ) {
-        ErrorResponse response = new ErrorResponse(
-                Instant.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+        ex.printStackTrace(); // TEMPORARY: shows real error in IntelliJ console
+
+        return buildError(
+                HttpStatus.INTERNAL_SERVER_ERROR,
                 "INTERNAL_SERVER_ERROR",
                 "An unexpected error occurred",
                 request.getRequestURI(),
                 List.of()
         );
+    }
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    private ResponseEntity<ErrorResponse> buildError(
+            HttpStatus status,
+            String code,
+            String message,
+            String path,
+            List<FieldErrorDetail> details
+    ) {
+        ErrorResponse response = new ErrorResponse(
+                Instant.now(),
+                status.value(),
+                status.getReasonPhrase(),
+                code,
+                message,
+                path,
+                details
+        );
+
+        return ResponseEntity.status(status).body(response);
     }
 
     private FieldErrorDetail toFieldErrorDetail(FieldError fieldError) {

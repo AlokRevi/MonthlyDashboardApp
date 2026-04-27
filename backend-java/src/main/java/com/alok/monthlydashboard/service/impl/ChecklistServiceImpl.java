@@ -1,7 +1,10 @@
 package com.alok.monthlydashboard.service.impl;
 
-import com.alok.monthlydashboard.dto.checklist.*;
-import com.alok.monthlydashboard.dto.dashboard.OccurrenceResponse;
+import com.alok.monthlydashboard.common.enums.OccurrenceStatus;
+import com.alok.monthlydashboard.dto.checklist.ChecklistItemResponse;
+import com.alok.monthlydashboard.dto.checklist.CompleteTaskRequest;
+import com.alok.monthlydashboard.dto.checklist.CompletionResponse;
+import com.alok.monthlydashboard.dto.checklist.TodayChecklistResponse;
 import com.alok.monthlydashboard.entity.Task;
 import com.alok.monthlydashboard.entity.TaskCompletion;
 import com.alok.monthlydashboard.exception.ConflictException;
@@ -12,6 +15,7 @@ import com.alok.monthlydashboard.repository.TaskRepository;
 import com.alok.monthlydashboard.service.ChecklistService;
 import com.alok.monthlydashboard.service.RecurrenceService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -20,6 +24,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
+@Transactional
 public class ChecklistServiceImpl implements ChecklistService {
 
     private final TaskRepository taskRepository;
@@ -37,20 +42,21 @@ public class ChecklistServiceImpl implements ChecklistService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public TodayChecklistResponse getTodayChecklist() {
         LocalDate today = LocalDate.now();
 
-        // V1 single-user shortcut
-        Long userId = 1L;
-
-        List<Task> activeTasks = taskRepository.findByUserIdAndIsActiveOrderByNameAsc(userId, true);
+        List<Task> activeTasks = taskRepository.findByIsActiveOrderByNameAsc(true);
         List<ChecklistItemResponse> items = new ArrayList<>();
 
         for (Task task : activeTasks) {
             List<LocalDate> candidateDates = collectCandidateDates(task, today);
 
             for (LocalDate occurrenceDate : candidateDates) {
-                if (taskCompletionRepository.existsByTaskIdAndOccurrenceDate(task.getId(), occurrenceDate)) {
+                boolean alreadyCompleted = taskCompletionRepository
+                        .existsByTaskIdAndOccurrenceDate(task.getId(), occurrenceDate);
+
+                if (alreadyCompleted) {
                     continue;
                 }
 
@@ -79,8 +85,7 @@ public class ChecklistServiceImpl implements ChecklistService {
 
     @Override
     public CompletionResponse completeTask(Long taskId, CompleteTaskRequest request) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
+        Task task = getTaskOrThrow(taskId);
 
         LocalDate today = LocalDate.now();
         LocalDate occurrenceDate = request.occurrenceDate();
@@ -106,7 +111,10 @@ public class ChecklistServiceImpl implements ChecklistService {
             throw new ValidationException("Provided occurrence date is not valid for this task");
         }
 
-        if (taskCompletionRepository.existsByTaskIdAndOccurrenceDate(taskId, occurrenceDate)) {
+        boolean alreadyCompleted = taskCompletionRepository
+                .existsByTaskIdAndOccurrenceDate(taskId, occurrenceDate);
+
+        if (alreadyCompleted) {
             throw new ConflictException("This task occurrence is already completed");
         }
 
@@ -128,47 +136,42 @@ public class ChecklistServiceImpl implements ChecklistService {
 
     @Override
     public void undoCompletion(Long taskId, LocalDate occurrenceDate) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
+        getTaskOrThrow(taskId);
 
-        taskCompletionRepository.findByTaskIdAndOccurrenceDate(task.getId(), occurrenceDate)
+        TaskCompletion completion = taskCompletionRepository
+                .findByTaskIdAndOccurrenceDate(taskId, occurrenceDate)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Completion not found for task id " + taskId + " and occurrence date " + occurrenceDate
                 ));
 
-        taskCompletionRepository.deleteByTaskIdAndOccurrenceDate(taskId, occurrenceDate);
+        taskCompletionRepository.delete(completion);
     }
 
-    /**
-     * Collect dates that could appear in today's checklist:
-     * - overdue dates from previous month
-     * - overdue dates earlier this month
-     * - due today
-     *
-     * Because tasks can spill across month boundaries, we check:
-     * - previous month
-     * - current month
-     */
+    private Task getTaskOrThrow(Long taskId) {
+        return taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
+    }
+
     private List<LocalDate> collectCandidateDates(Task task, LocalDate today) {
-        List<LocalDate> all = new ArrayList<>();
+        List<LocalDate> allDates = new ArrayList<>();
 
         YearMonth currentMonth = YearMonth.from(today);
         YearMonth previousMonth = currentMonth.minusMonths(1);
 
-        all.addAll(recurrenceService.generateOccurrenceDatesForMonth(
+        allDates.addAll(recurrenceService.generateOccurrenceDatesForMonth(
                 task.getId(),
                 previousMonth.getYear(),
                 previousMonth.getMonthValue()
         ));
 
-        all.addAll(recurrenceService.generateOccurrenceDatesForMonth(
+        allDates.addAll(recurrenceService.generateOccurrenceDatesForMonth(
                 task.getId(),
                 currentMonth.getYear(),
                 currentMonth.getMonthValue()
         ));
 
-        return all.stream()
-                .filter(date -> !date.isAfter(today)) // only today or earlier
+        return allDates.stream()
+                .filter(date -> !date.isAfter(today))
                 .sorted()
                 .toList();
     }

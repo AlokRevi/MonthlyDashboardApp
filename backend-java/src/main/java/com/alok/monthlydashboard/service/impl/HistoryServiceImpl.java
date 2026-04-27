@@ -1,28 +1,36 @@
 package com.alok.monthlydashboard.service.impl;
 
-import com.alok.monthlydashboard.dto.dashboard.*;
+import com.alok.monthlydashboard.common.enums.OccurrenceStatus;
+import com.alok.monthlydashboard.dto.dashboard.DashboardCategoryResponse;
+import com.alok.monthlydashboard.dto.dashboard.DashboardTaskResponse;
+import com.alok.monthlydashboard.dto.dashboard.DayStripItemResponse;
+import com.alok.monthlydashboard.dto.dashboard.MonthlyDashboardResponse;
+import com.alok.monthlydashboard.dto.dashboard.OccurrenceResponse;
+import com.alok.monthlydashboard.dto.dashboard.ScaleBarResponse;
 import com.alok.monthlydashboard.dto.history.TaskHistoryItemResponse;
 import com.alok.monthlydashboard.dto.history.TaskHistoryResponse;
 import com.alok.monthlydashboard.entity.Category;
 import com.alok.monthlydashboard.entity.Task;
 import com.alok.monthlydashboard.entity.TaskCompletion;
+import com.alok.monthlydashboard.exception.ResourceNotFoundException;
 import com.alok.monthlydashboard.repository.CategoryRepository;
 import com.alok.monthlydashboard.repository.TaskCompletionRepository;
 import com.alok.monthlydashboard.repository.TaskRepository;
 import com.alok.monthlydashboard.service.HistoryService;
 import com.alok.monthlydashboard.service.RecurrenceService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
 @Service
+@Transactional(readOnly = true)
 public class HistoryServiceImpl implements HistoryService {
 
     private final CategoryRepository categoryRepository;
@@ -44,14 +52,12 @@ public class HistoryServiceImpl implements HistoryService {
 
     @Override
     public MonthlyDashboardResponse getPastMonth(int year, int month) {
-        Long userId = 1L; // V1 single-user shortcut
-
         YearMonth targetMonth = YearMonth.of(year, month);
         LocalDate today = LocalDate.now();
 
         ScaleBarResponse scaleBar = buildScaleBar(targetMonth);
         List<DayStripItemResponse> dayStrip = buildDayStrip(targetMonth, today);
-        List<DashboardCategoryResponse> categoryResponses = buildCategoryResponses(userId, targetMonth);
+        List<DashboardCategoryResponse> categoryResponses = buildCategoryResponses(targetMonth);
 
         return new MonthlyDashboardResponse(
                 year,
@@ -67,20 +73,17 @@ public class HistoryServiceImpl implements HistoryService {
 
     @Override
     public TaskHistoryResponse getTaskHistory(Long taskId) {
-        Long userId = 1L; // V1 single-user shortcut
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
 
-        Task task = taskRepository.findByIdAndUserId(taskId, userId)
-                .orElseThrow(() -> new com.alok.monthlydashboard.exception.ResourceNotFoundException(
-                        "Task not found with id: " + taskId
-                ));
-
-        List<TaskCompletion> completions = taskCompletionRepository.findByTaskIdOrderByOccurrenceDateAsc(taskId);
+        List<TaskCompletion> completions = taskCompletionRepository
+                .findByTaskIdOrderByOccurrenceDateAsc(taskId);
 
         List<TaskHistoryItemResponse> historyItems = completions.stream()
                 .map(completion -> new TaskHistoryItemResponse(
                         completion.getOccurrenceDate(),
                         completion.getCompletionDate(),
-                        com.alok.monthlydashboard.dto.checklist.OccurrenceStatus.COMPLETED
+                        OccurrenceStatus.COMPLETED
                 ))
                 .toList();
 
@@ -91,12 +94,12 @@ public class HistoryServiceImpl implements HistoryService {
         );
     }
 
-    private List<DashboardCategoryResponse> buildCategoryResponses(Long userId, YearMonth targetMonth) {
-        List<Category> categories = categoryRepository.findByUserIdOrderByNameAsc(userId);
+    private List<DashboardCategoryResponse> buildCategoryResponses(YearMonth targetMonth) {
+        List<Category> categories = categoryRepository.findAllByOrderByNameAsc();
         List<DashboardCategoryResponse> results = new ArrayList<>();
 
         for (Category category : categories) {
-            List<Task> tasks = taskRepository.findByUserIdAndCategoryIdOrderByNameAsc(userId, category.getId());
+            List<Task> tasks = taskRepository.findByCategoryIdOrderByNameAsc(category.getId());
 
             List<DashboardTaskResponse> taskResponses = new ArrayList<>();
 
