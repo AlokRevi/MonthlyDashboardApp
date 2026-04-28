@@ -1,0 +1,147 @@
+.quick-form {
+  background: white;
+  border: 1px solid #dbe3ef;
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+}
+
+.quick-form h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+}
+
+.form-box {
+  border: 1px solid #dbe3ef;
+  border-radius: 14px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.form-box h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.form-row {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.form-row label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+select,
+input {
+  min-width: 130px;
+  border: 1px solid #d1d5db;
+  border-radius: 9px;
+  padding: 8px 10px;
+  background: white;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  border-radius: 10px;
+  background: #16a34a;
+  color: white;
+  font-weight: 700;
+  padding: 9px 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #15803d;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.recurrence-row {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.checkbox-label {
+  flex-direction: row !important;
+  align-items: center;
+  margin-top: 23px;
+}
+
+.checkbox-label input {
+  min-width: auto;
+}
+
+.add-task-button {
+  margin-top: 12px;
+}
+
+.form-helper {
+  margin: 7px 0 0;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.field-error {
+  color: #b91c1c;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.color-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.color-picker {
+  min-width: 44px;
+  width: 44px;
+  height: 36px;
+  padding: 3px;
+  cursor: pointer;
+}
+
+.color-preview {
+  width: 13px;
+  height: 13px;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.color-code {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 760px) {
+  .form-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-row label,
+  button {
+    width: 100%;
+  }
+
+  .quick-form {
+    border-radius: 14px;
+    padding: 12px;
+  }
+}

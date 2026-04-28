@@ -1,0 +1,136 @@
+@if (open) {
+<div class="modal-backdrop">
+  <section class="edit-modal">
+    <header class="modal-header">
+      <h2>Edit Task</h2>
+
+      <button type="button" class="modal-close" (click)="close.emit()">×</button>
+    </header>
+
+    @if (loading) {
+    <p class="loading">Loading task...</p>
+    } @else {
+    <div class="form-row">
+      <label>
+        Category
+        <select [(ngModel)]="editTaskCategoryId">
+          @for (category of availableCategories; track category.id) {
+          <option [value]="category.id">{{ category.name }}</option>
+          }
+        </select>
+        @if (fieldErrors['editTaskCategory']) {
+        <span class="field-error">{{ fieldErrors['editTaskCategory'] }}</span>
+        }
+      </label>
+
+      <label>
+        Task Name
+        <input type="text" [(ngModel)]="editTaskName" />
+        @if (fieldErrors['editTaskName']) {
+        <span class="field-error">{{ fieldErrors['editTaskName'] }}</span>
+        }
+      </label>
+
+      <label>
+        Description
+        <input type="text" [(ngModel)]="editTaskDescription" />
+      </label>
+    </div>
+
+    <div class="form-row">
+      <label>
+        Recurrence
+        <select [(ngModel)]="editTaskRecurrenceType">
+          @for (option of recurrenceOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Start Date
+        <input type="date" [(ngModel)]="editTaskStartDate" />
+        @if (fieldErrors['editTaskStartDate']) {
+        <span class="field-error">{{ fieldErrors['editTaskStartDate'] }}</span>
+        }
+      </label>
+
+      <label>
+        End Date
+        <input type="date" [(ngModel)]="editTaskEndDate" />
+        @if (fieldErrors['editTaskEndDate']) {
+        <span class="field-error">{{ fieldErrors['editTaskEndDate'] }}</span>
+        }
+      </label>
+    </div>
+
+    @if (editTaskRecurrenceType === 'FIXED_DATE') {
+    <div class="form-row recurrence-row">
+      <label>
+        Dates of Task/Event
+        <input type="text" [(ngModel)]="editTaskFixedDatesText" placeholder="Example: 8, 21" />
+        @if (fieldErrors['editFixedDates']) {
+        <span class="field-error">{{ fieldErrors['editFixedDates'] }}</span>
+        }
+      </label>
+
+      <label class="checkbox-label">
+        <input type="checkbox" [(ngModel)]="editFallbackToLastDay" />
+        If this date doesn't exist, move it to the last day
+      </label>
+    </div>
+    }
+
+    @if (editTaskRecurrenceType === 'INTERVAL') {
+    <div class="form-row recurrence-row">
+      <label>
+        Every
+        <input type="number" min="1" [(ngModel)]="editIntervalValue" />
+        @if (fieldErrors['editIntervalValue']) {
+        <span class="field-error">{{ fieldErrors['editIntervalValue'] }}</span>
+        }
+      </label>
+
+      <label>
+        Unit
+        <select [(ngModel)]="editIntervalUnit">
+          @for (option of intervalUnitOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </label>
+    </div>
+    }
+
+    @if (editTaskRecurrenceType === 'WEEKDAY') {
+    <div class="form-row recurrence-row">
+      <label>
+        Week
+        <select [(ngModel)]="editWeekOfMonth">
+          @for (option of weekOfMonthOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Weekday
+        <select [(ngModel)]="editWeekday">
+          @for (day of weekdayOptions; track day) {
+          <option [value]="day">{{ day }}</option>
+          }
+        </select>
+      </label>
+    </div>
+    }
+
+    <div class="modal-actions">
+      <button type="button" class="secondary-button" (click)="close.emit()">Cancel</button>
+      <button type="button" [disabled]="saving" (click)="onSave()">
+        {{ saving ? 'Saving...' : 'Save Changes' }}
+      </button>
+    </div>
+    }
+  </section>
+</div>
+}

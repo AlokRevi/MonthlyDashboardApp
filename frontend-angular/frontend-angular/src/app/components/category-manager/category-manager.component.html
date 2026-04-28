@@ -1,0 +1,55 @@
+<section class="category-cleanup">
+  <h2>Categories</h2>
+
+  @if (categories.length === 0) {
+  <p class="empty-small">No categories yet.</p>
+  }
+
+  @for (category of categories; track category.id) {
+  <div
+    class="cleanup-row category-hover-row"
+    [class.category-expanded]="isCategoryExpanded(category.id)">
+
+    <button
+      type="button"
+      class="category-summary-button"
+      [style.border-color]="category.color"
+      (click)="toggleCategory(category.id)">
+      <span class="category-name-with-color">
+        <i class="category-color-dot" [style.background]="category.color"></i>
+
+        <span>
+          {{ category.name }}
+          <small>({{ category.taskCount }} tasks)</small>
+        </span>
+      </span>
+
+      <span class="category-arrow">
+        {{ isCategoryExpanded(category.id) ? '▴' : '▾' }}
+      </span>
+    </button>
+
+    @if (category.taskCount === 0) {
+    <button
+      type="button"
+      class="category-delete-button"
+      (click)="deleteCategory.emit(category.id)">
+      Delete
+    </button>
+    }
+
+    <div class="completed-category-popover">
+      @if (getCategoryTaskItems(category.id).length === 0) {
+      <p class="completed-empty">No active tasks this month.</p>
+      }
+
+      @for (item of getCategoryTaskItems(category.id); track item.taskName + item.occurrenceDate) {
+      <div class="completed-task-item">
+        <strong>{{ item.taskName }}</strong>
+        <span>{{ dateFormat.toWeekdayLongMonthOrdinal(item.occurrenceDate) }}</span>
+      </div>
+      }
+    </div>
+  </div>
+  }
+</section>

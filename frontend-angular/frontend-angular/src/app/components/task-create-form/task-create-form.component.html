@@ -1,0 +1,166 @@
+<section class="quick-form">
+  <h2>Quick Add</h2>
+
+  <div class="form-box">
+    <h3>Add Task</h3>
+
+    <div class="form-row">
+      <label>
+        Category
+        <select [(ngModel)]="newTaskCategoryId">
+          @for (category of availableCategories; track category.id) {
+          <option [value]="category.id">{{ category.name }}</option>
+          }
+        </select>
+        @if (fieldErrors['taskCategory']) {
+        <span class="field-error">{{ fieldErrors['taskCategory'] }}</span>
+        }
+      </label>
+
+      <label>
+        Task Name
+        <input type="text" [(ngModel)]="newTaskName" placeholder="Credit Card Bill" />
+        @if (fieldErrors['taskName']) {
+        <span class="field-error">{{ fieldErrors['taskName'] }}</span>
+        }
+      </label>
+
+      <label>
+        Description
+        <input type="text" [(ngModel)]="newTaskDescription" placeholder="Pay monthly bill" />
+      </label>
+
+      <label>
+        Recurrence
+        <select [(ngModel)]="newTaskRecurrenceType">
+          @for (option of recurrenceOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Start Date
+        <input type="date" [(ngModel)]="newTaskStartDate" />
+        @if (fieldErrors['taskStartDate']) {
+        <span class="field-error">{{ fieldErrors['taskStartDate'] }}</span>
+        }
+      </label>
+
+      <label>
+        End Date
+        <input type="date" [(ngModel)]="newTaskEndDate" />
+        @if (fieldErrors['taskEndDate']) {
+        <span class="field-error">{{ fieldErrors['taskEndDate'] }}</span>
+        }
+      </label>
+    </div>
+
+    @if (newTaskRecurrenceType === 'FIXED_DATE') {
+    <div class="form-row recurrence-row">
+      <label>
+        Dates of Task/Event (1-31, comma-separated)
+        <input
+          type="text"
+          [(ngModel)]="newTaskFixedDatesText"
+          placeholder="Example: 8, 21" />
+        @if (fieldErrors['fixedDates']) {
+        <span class="field-error">{{ fieldErrors['fixedDates'] }}</span>
+        }
+      </label>
+
+      <label class="checkbox-label">
+        <input type="checkbox" [(ngModel)]="fallbackToLastDay" />
+        If this date doesn't exist, move it to the last day
+      </label>
+    </div>
+
+    <p class="form-helper">Example: 31st becomes 30th in April, 28th in February.</p>
+    }
+
+    @if (newTaskRecurrenceType === 'INTERVAL') {
+    <div class="form-row recurrence-row">
+      <label>
+        Every
+        <input type="number" min="1" [(ngModel)]="intervalValue" />
+        @if (fieldErrors['intervalValue']) {
+        <span class="field-error">{{ fieldErrors['intervalValue'] }}</span>
+        }
+      </label>
+
+      <label>
+        Unit
+        <select [(ngModel)]="intervalUnit">
+          @for (option of intervalUnitOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </label>
+    </div>
+    }
+
+    @if (newTaskRecurrenceType === 'WEEKDAY') {
+    <div class="form-row recurrence-row">
+      <label>
+        Week
+        <select [(ngModel)]="weekOfMonth">
+          @for (option of weekOfMonthOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+        @if (fieldErrors['weekOfMonth']) {
+        <span class="field-error">{{ fieldErrors['weekOfMonth'] }}</span>
+        }
+      </label>
+
+      <label>
+        Weekday
+        <select [(ngModel)]="weekday">
+          @for (day of weekdayOptions; track day) {
+          <option [value]="day">{{ day }}</option>
+          }
+        </select>
+      </label>
+    </div>
+    }
+
+    <button
+      class="add-task-button"
+      type="button"
+      [disabled]="taskSaving || availableCategories.length === 0"
+      (click)="onCreateTask()">
+      {{ taskSaving ? 'Saving...' : 'Add Task' }}
+    </button>
+
+    @if (availableCategories.length === 0) {
+    <p class="form-helper">Create a category first before adding tasks.</p>
+    }
+  </div>
+
+  <div class="form-box">
+    <h3>Add Category</h3>
+
+    <div class="form-row">
+      <label>
+        Category Name
+        <input type="text" [(ngModel)]="newCategoryName" placeholder="Bills" />
+        @if (fieldErrors['categoryName']) {
+        <span class="field-error">{{ fieldErrors['categoryName'] }}</span>
+        }
+      </label>
+
+      <label>
+        Category Colour
+        <div class="color-picker-row">
+          <input class="color-picker" type="color" [(ngModel)]="newCategoryColor" />
+          <span class="color-preview" [style.background]="newCategoryColor"></span>
+          <span class="color-code">{{ newCategoryColor }}</span>
+        </div>
+      </label>
+
+      <button type="button" [disabled]="categorySaving" (click)="onCreateCategory()">
+        {{ categorySaving ? 'Saving...' : 'Add Category' }}
+      </button>
+    </div>
+  </div>
+</section>

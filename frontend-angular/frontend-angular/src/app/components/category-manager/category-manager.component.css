@@ -1,0 +1,143 @@
+.category-cleanup {
+  margin-top: 14px;
+  background: white;
+  border: 1px solid #dbe3ef;
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: 0 14px 35px rgba(15, 23, 42, 0.08);
+}
+
+.category-cleanup h2 {
+  margin: 0 0 8px;
+  font-size: 19px;
+}
+
+.empty-small {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.cleanup-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border-top: 1px solid #e5e7eb;
+  padding: 8px 0;
+  font-size: 13px;
+}
+
+.cleanup-row:first-of-type {
+  border-top: none;
+}
+
+.cleanup-row small {
+  color: #64748b;
+}
+
+.category-hover-row {
+  position: relative;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.category-summary-button {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 999px;
+  background: white;
+  color: #1f2937;
+  padding: 5px 10px;
+  text-align: left;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.category-summary-button:hover {
+  background: #f8fafc;
+}
+
+.category-name-with-color {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.category-color-dot {
+  width: 13px;
+  height: 13px;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.category-arrow {
+  color: #64748b;
+  font-size: 12px;
+  margin-left: 8px;
+}
+
+.category-delete-button {
+  width: fit-content;
+  margin-top: 6px;
+  border: 1px solid #fecaca;
+  border-radius: 999px;
+  background: #fff1f2;
+  color: #be123c;
+  padding: 5px 10px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.completed-category-popover {
+  display: none;
+  margin-top: 4px;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .category-hover-row:hover .completed-category-popover {
+    display: block;
+  }
+}
+
+.category-hover-row.category-expanded .completed-category-popover {
+  display: block;
+}
+
+.completed-empty {
+  margin: 0;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.completed-task-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+  border-top: 1px solid #f1f5f9;
+  font-size: 12px;
+}
+
+.completed-task-item:first-of-type {
+  border-top: none;
+}
+
+.completed-task-item strong {
+  color: #1f2937;
+}
+
+.completed-task-item span {
+  color: #64748b;
+}

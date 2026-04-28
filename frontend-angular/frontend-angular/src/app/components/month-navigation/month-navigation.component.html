@@ -1,0 +1,30 @@
+<div class="controls">
+  <label>
+    Year
+    <input
+      type="number"
+      [ngModel]="selectedYear"
+      (ngModelChange)="onYearChanged($event)" />
+  </label>
+
+  <label>
+    Month
+    <select
+      [ngModel]="selectedMonth"
+      (ngModelChange)="onMonthChanged($event)">
+      @for (month of monthOptions; track month.value) {
+      <option [value]="month.value">{{ month.label }}</option>
+      }
+    </select>
+  </label>
+
+  <button type="button" [disabled]="loading" (click)="loadMonth.emit()">
+    {{ loading ? 'Loading...' : 'Load' }}
+  </button>
+</div>
+
+<div class="month-actions">
+  <button type="button" [disabled]="loading" (click)="previousMonth.emit()">← Previous</button>
+  <button type="button" [disabled]="loading" (click)="currentMonth.emit()">Current Month</button>
+  <button type="button" [disabled]="loading" (click)="nextMonth.emit()">Next →</button>
+</div>

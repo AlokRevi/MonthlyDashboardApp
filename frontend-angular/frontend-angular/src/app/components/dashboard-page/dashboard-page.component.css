@@ -1,5 +1,5 @@
 /* =========================================
-   BASE PAGE
+   PAGE SHELL
 ========================================= */
 
 :host {
@@ -37,6 +37,13 @@
   text-transform: uppercase;
 }
 
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 h1 {
   margin: 0;
   font-size: 32px;
@@ -45,7 +52,7 @@ h1 {
 }
 
 .dashboard-intro {
-  max-width: 800px;
+  max-width: 900px;
   margin: 5px 0 0;
   color: #475569;
   font-size: 13px;
@@ -53,164 +60,22 @@ h1 {
   font-weight: 400;
 }
 
-/* =========================================
-   SHARED FORM STYLES
-========================================= */
-
-.controls,
-.form-row,
-.month-actions {
-  display: flex;
-  align-items: end;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.controls label,
-.form-row label {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  color: #475569;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-select,
-input {
-  min-width: 130px;
-  border: 1px solid #d1d5db;
-  border-radius: 9px;
-  padding: 8px 10px;
-  background: white;
-}
-
-
-button {
-  font-family: inherit;
-  border: none;
-  border-radius: 10px;
-  background: #2563eb;
-  color: white;
-  font-weight: 700;
-  padding: 9px 16px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #1d4ed8;
-}
-
-button:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.field-error {
-  color: #b91c1c;
+.overdue-badge,
+.today-badge {
+  border-radius: 999px;
+  padding: 4px 8px;
   font-size: 11px;
   font-weight: 800;
 }
 
-/* =========================================
-   QUICK ADD
-========================================= */
-
-.quick-form {
-  background: white;
-  border: 1px solid #dbe3ef;
-  border-radius: 16px;
-  padding: 14px 16px;
-  margin-bottom: 14px;
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+.overdue-badge {
+  background: #ffedd5;
+  color: #c2410c;
 }
 
-.quick-form h2 {
-  margin: 0 0 8px;
-  font-size: 22px;
-}
-
-.form-box {
-  border: 1px solid #dbe3ef;
-  border-radius: 14px;
-  padding: 12px;
-  margin-top: 10px;
-}
-
-.form-box h3 {
-  margin: 0 0 8px;
-  font-size: 16px;
-}
-
-.form-row button {
-  background: #16a34a;
-}
-
-.form-row button:hover {
-  background: #15803d;
-}
-
-.recurrence-row {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid #e5e7eb;
-}
-
-.checkbox-label {
-  flex-direction: row !important;
-  align-items: center;
-  margin-top: 23px;
-}
-
-.checkbox-label input {
-  min-width: auto;
-}
-
-.add-task-button {
-  margin-top: 12px;
-}
-
-.form-helper,
-.helper-note {
-  color: #64748b;
-  font-size: 12px;
-}
-
-.form-helper {
-  margin: 7px 0 0;
-}
-
-/* =========================================
-   CATEGORY COLOR PICKER
-========================================= */
-
-.color-picker-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.color-picker {
-  min-width: 44px;
-  width: 44px;
-  height: 36px;
-  padding: 3px;
-  cursor: pointer;
-}
-
-.color-preview,
-.category-color-dot {
-  width: 13px;
-  height: 13px;
-  border-radius: 999px;
-  border: 1px solid #cbd5e1;
-  display: inline-block;
-}
-
-.color-code {
-  color: #64748b;
-  font-size: 12px;
-  font-weight: 700;
+.today-badge {
+  background: #dbeafe;
+  color: #1d4ed8;
 }
 
 /* =========================================
@@ -236,28 +101,7 @@ button:disabled {
 }
 
 /* =========================================
-   MONTH ACTIONS
-========================================= */
-
-.month-actions {
-  margin: 0 0 14px;
-}
-
-.month-actions button {
-  background: white;
-  color: #1f2937;
-  border: 1px solid #dbe3ef;
-  border-radius: 999px;
-  padding: 8px 14px;
-}
-
-.month-actions button:hover {
-  background: #eff6ff;
-}
-
-/* =========================================
-   MAIN LAYOUT - DESKTOP
-   Main monthly card left, checklist/categories right.
+   DASHBOARD LAYOUT
 ========================================= */
 
 .dashboard-layout {
@@ -269,6 +113,11 @@ button:disabled {
 
 .main-panel {
   min-width: 0;
+}
+
+.side-panel {
+  position: sticky;
+  top: 20px;
 }
 
 .card {
@@ -292,7 +141,7 @@ button:disabled {
 }
 
 /* =========================================
-   LEGEND
+   LEGEND AND EMPTY STATES
 ========================================= */
 
 .legend {
@@ -335,9 +184,10 @@ button:disabled {
   background: #93c5fd;
 }
 
-/* =========================================
-   EMPTY STATES
-========================================= */
+.helper-note {
+  color: #64748b;
+  font-size: 12px;
+}
 
 .empty-dashboard-state {
   border: 1px dashed #cbd5e1;
@@ -352,73 +202,14 @@ button:disabled {
   color: #1f2937;
 }
 
-.empty-dashboard-state p,
-.empty-small {
+.empty-dashboard-state p {
   margin: 4px 0 0;
   color: #64748b;
   font-size: 13px;
 }
 
 /* =========================================
-   SIDE PANEL
-========================================= */
-
-.side-panel {
-  position: sticky;
-  top: 20px;
-}
-
-.category-cleanup {
-  margin-top: 14px;
-  background: white;
-  border: 1px solid #dbe3ef;
-  border-radius: 18px;
-  padding: 14px;
-  box-shadow: 0 14px 35px rgba(15, 23, 42, 0.08);
-}
-
-.category-cleanup h2 {
-  margin: 0 0 8px;
-  font-size: 19px;
-}
-
-.cleanup-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  border-top: 1px solid #e5e7eb;
-  padding: 8px 0;
-  font-size: 13px;
-}
-
-.cleanup-row:first-of-type {
-  border-top: none;
-}
-
-.cleanup-row small {
-  color: #64748b;
-}
-
-.cleanup-row button {
-  border: 1px solid #fecaca;
-  border-radius: 999px;
-  background: #fff1f2;
-  color: #be123c;
-  padding: 5px 10px;
-  font-size: 12px;
-}
-
-.category-name-with-color {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* =========================================
-   TABLET RESPONSIVE
-   Keep checklist/categories beside dashboard
-   as long as there is enough width.
+   RESPONSIVE LAYOUT
 ========================================= */
 
 @media (max-width: 1200px) and (min-width: 761px) {
@@ -431,17 +222,6 @@ button:disabled {
     position: static;
   }
 }
-
-/* =========================================
-   MOBILE RESPONSIVE
-   Important change:
-   We DO NOT move side-panel above main-panel anymore.
-   The order now stays:
-   1. Quick Add
-   2. Month buttons
-   3. April dashboard card
-   4. Today Checklist + Categories
-========================================= */
 
 @media (max-width: 760px) {
   .dashboard-page {
@@ -462,52 +242,9 @@ button:disabled {
     font-size: 12px;
   }
 
-  .controls,
-  .form-row,
-  .month-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .controls label,
-  .form-row label {
-    width: 100%;
-  }
-
-select,
-input {
-  font-family: inherit;
-  min-width: 130px;
-  border: 1px solid #d1d5db;
-  border-radius: 9px;
-  padding: 8px 10px;
-  background: white;
-}
-
-  button {
-    width: 100%;
-  }
-
-
-
-  .quick-form,
-  .card,
-  .category-cleanup {
+  .card {
     border-radius: 14px;
     padding: 12px;
-  }
-
-  .checkbox-label {
-    align-items: flex-start;
-    margin-top: 4px;
-  }
-
-  .checkbox-label input {
-    width: auto;
-  }
-
-  .month-actions button {
-    width: 100%;
   }
 
   .dashboard-layout {
@@ -523,222 +260,5 @@ input {
   .side-panel {
     order: 2;
     position: static;
-  }
-}
-
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.45);
-  display: grid;
-  place-items: center;
-  z-index: 1000;
-  padding: 16px;
-}
-
-.edit-modal {
-  width: min(900px, 100%);
-  max-height: 90vh;
-  overflow-y: auto;
-  background: white;
-  border-radius: 18px;
-  border: 1px solid #dbe3ef;
-  padding: 18px;
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
-}
-
-.modal-header h2 {
-  margin: 0;
-}
-
-.modal-close {
-  width: auto;
-  background: white;
-  color: #1f2937;
-  border: 1px solid #dbe3ef;
-  border-radius: 999px;
-  padding: 6px 12px;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 16px;
-}
-
-.secondary-button {
-  background: white;
-  color: #1f2937;
-  border: 1px solid #dbe3ef;
-}
-
-@media (max-width: 760px) {
-  .modal-actions {
-    flex-direction: column;
-  }
-}
-/* =========================================
-   CATEGORY COMPLETED TASK HOVER/TAP
-========================================= */
-
-.category-hover-row {
-  position: relative;
-  flex-direction: column;
-  align-items: stretch;
-}
-
-.category-summary-button {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  text-align: left;
-  background: transparent;
-  color: #1f2937;
-  padding: 0;
-  border-radius: 0;
-}
-
-.category-summary-button:hover {
-  background: transparent;
-}
-
-.category-arrow {
-  color: #64748b;
-  font-size: 12px;
-  margin-left: 8px;
-}
-
-.category-delete-button {
-  width: fit-content;
-  margin-top: 6px;
-  border: 1px solid #fecaca;
-  border-radius: 999px;
-  background: #fff1f2;
-  color: #be123c;
-  padding: 5px 10px;
-  font-size: 12px;
-}
-
-.completed-category-popover {
-  display: none;
-  margin-top: 8px;
-  border-top: 1px solid #e5e7eb;
-  padding-top: 8px;
-}
-
-/* Desktop hover opens completed list */
-@media (hover: hover) and (pointer: fine) {
-  .category-hover-row:hover .completed-category-popover {
-    display: block;
-  }
-}
-
-/* Mobile/touch arrow opens completed list */
-.category-hover-row.category-expanded .completed-category-popover {
-  display: block;
-}
-
-.completed-empty {
-  margin: 0;
-  color: #64748b;
-  font-size: 12px;
-}
-
-.completed-task-item {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 5px 0;
-  border-top: 1px solid #f1f5f9;
-  font-size: 12px;
-}
-
-.completed-task-item:first-of-type {
-  border-top: none;
-}
-
-.completed-task-item strong {
-  color: #1f2937;
-}
-
-.completed-task-item span {
-  color: #64748b;
-}
-/* =========================================
-   EDIT TASK MODAL
-========================================= */
-
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.45);
-  display: grid;
-  place-items: center;
-  z-index: 1000;
-  padding: 16px;
-}
-
-.edit-modal {
-  width: min(900px, 100%);
-  max-height: 90vh;
-  overflow-y: auto;
-  background: white;
-  border-radius: 18px;
-  border: 1px solid #dbe3ef;
-  padding: 18px;
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
-}
-
-.modal-header h2 {
-  margin: 0;
-}
-
-.modal-close {
-  width: auto;
-  background: white;
-  color: #1f2937;
-  border: 1px solid #dbe3ef;
-  border-radius: 999px;
-  padding: 6px 12px;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 16px;
-}
-
-.secondary-button {
-  background: white;
-  color: #1f2937;
-  border: 1px solid #dbe3ef;
-}
-
-.field-error {
-  color: #b91c1c;
-  font-size: 11px;
-  font-weight: 800;
-}
-
-@media (max-width: 760px) {
-  .modal-actions {
-    flex-direction: column;
   }
 }
