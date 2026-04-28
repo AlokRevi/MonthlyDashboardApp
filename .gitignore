@@ -1,0 +1,31 @@
+# Java / Maven build output
+target/
+backend-java/target/
+
+# Node dependencies and Angular output
+node_modules/
+**/node_modules/
+.angular/
+dist/
+frontend-angular/frontend-angular/dist/
+frontend-angular/frontend-angular/.angular/
+
+# IDE metadata
+.idea/
+**/.idea/
+.vscode/
+
+# Local environment files
+.env
+.env.*
+
+# Local SQLite user data
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# OS files
+.DS_Store
+Thumbs.db
