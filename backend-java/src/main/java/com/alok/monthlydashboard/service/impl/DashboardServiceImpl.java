@@ -10,6 +10,7 @@ import com.alok.monthlydashboard.entity.Category;
 import com.alok.monthlydashboard.entity.Task;
 import com.alok.monthlydashboard.repository.CategoryRepository;
 import com.alok.monthlydashboard.repository.TaskRepository;
+import com.alok.monthlydashboard.service.AppDateProvider;
 import com.alok.monthlydashboard.service.DashboardService;
 import com.alok.monthlydashboard.service.RecurrenceService;
 import org.springframework.stereotype.Service;
@@ -28,21 +29,24 @@ public class DashboardServiceImpl implements DashboardService {
     private final CategoryRepository categoryRepository;
     private final TaskRepository taskRepository;
     private final RecurrenceService recurrenceService;
+    private final AppDateProvider appDateProvider;
 
     public DashboardServiceImpl(
             CategoryRepository categoryRepository,
             TaskRepository taskRepository,
-            RecurrenceService recurrenceService
+            RecurrenceService recurrenceService,
+            AppDateProvider appDateProvider
     ) {
         this.categoryRepository = categoryRepository;
         this.taskRepository = taskRepository;
         this.recurrenceService = recurrenceService;
+        this.appDateProvider = appDateProvider;
     }
 
     @Override
     public MonthlyDashboardResponse getMonthlyDashboard(int year, int month) {
         YearMonth targetMonth = YearMonth.of(year, month);
-        LocalDate today = LocalDate.now();
+        LocalDate today = appDateProvider.today();
 
         ScaleBarResponse scaleBar = buildScaleBar(targetMonth, today);
         List<DayStripItemResponse> dayStrip = buildDayStrip(targetMonth, today);

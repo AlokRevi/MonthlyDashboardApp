@@ -51,7 +51,11 @@ class TaskEditRegressionTest {
         taskCompletionRepository = Mockito.mock(TaskCompletionRepository.class);
 
         taskService = new TaskServiceImpl(taskRepository, categoryRepository, taskCompletionRepository);
-        recurrenceService = new RecurrenceServiceImpl(taskRepository, taskCompletionRepository);
+        recurrenceService = new RecurrenceServiceImpl(
+                taskRepository,
+                taskCompletionRepository,
+                () -> LocalDate.of(2026, 4, 28)
+        );
 
         bills = category(1L, "Bills");
         errands = category(2L, "Errands");
@@ -113,7 +117,8 @@ class TaskEditRegressionTest {
         DashboardService dashboardService = new DashboardServiceImpl(
                 categoryRepository,
                 taskRepository,
-                recurrenceService
+                recurrenceService,
+                () -> LocalDate.of(2026, 4, 28)
         );
 
         MonthlyDashboardResponse dashboard = dashboardService.getMonthlyDashboard(2026, 4);

@@ -14,11 +14,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @TestPropertySource(properties = {
@@ -40,10 +42,16 @@ class ChecklistIntegrationTest {
     @Autowired
     private TaskCompletionRepository taskCompletionRepository;
 
+    @MockBean
+    private AppDateProvider appDateProvider;
+
     private Category category;
+    private final LocalDate today = LocalDate.of(2026, 4, 28);
 
     @BeforeEach
     void setUp() {
+        when(appDateProvider.today()).thenReturn(today);
+
         taskCompletionRepository.deleteAll();
         taskRepository.deleteAll();
         categoryRepository.deleteAll();
@@ -56,7 +64,6 @@ class ChecklistIntegrationTest {
 
     @Test
     void tasksDueTodayAppearInTodayChecklist() {
-        LocalDate today = LocalDate.now();
         Task task = saveFixedDateTask("Flowers", today, today.getDayOfMonth());
 
         TodayChecklistResponse checklist = checklistService.getTodayChecklist();
@@ -74,7 +81,6 @@ class ChecklistIntegrationTest {
 
     @Test
     void overdueTasksAppearInTodayChecklist() {
-        LocalDate today = LocalDate.now();
         LocalDate overdueDate = today.minusDays(1);
         Task task = saveFixedDateTask("Movie Night", overdueDate, overdueDate.getDayOfMonth());
 
@@ -92,7 +98,7 @@ class ChecklistIntegrationTest {
 
     @Test
     void completedPastOccurrencesAreExcludedFromTodayChecklist() {
-        LocalDate completedOccurrenceDate = LocalDate.now().minusDays(1);
+        LocalDate completedOccurrenceDate = today.minusDays(1);
         Task task = saveFixedDateTask(
                 "Already Done",
                 completedOccurrenceDate,

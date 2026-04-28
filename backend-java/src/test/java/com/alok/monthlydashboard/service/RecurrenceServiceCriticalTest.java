@@ -34,7 +34,11 @@ class RecurrenceServiceCriticalTest {
     void setUp() {
         taskRepository = Mockito.mock(TaskRepository.class);
         taskCompletionRepository = Mockito.mock(TaskCompletionRepository.class);
-        recurrenceService = new RecurrenceServiceImpl(taskRepository, taskCompletionRepository);
+        recurrenceService = new RecurrenceServiceImpl(
+                taskRepository,
+                taskCompletionRepository,
+                () -> LocalDate.of(2026, 4, 28)
+        );
 
         when(taskCompletionRepository.findByTaskIdAndOccurrenceDate(anyLong(), any(LocalDate.class)))
                 .thenReturn(Optional.empty());
@@ -67,7 +71,7 @@ class RecurrenceServiceCriticalTest {
 
     @Test
     void pastIncompleteOccurrenceIsMarkedOverdue() {
-        LocalDate yesterday = LocalDate.now().minusDays(1);
+        LocalDate yesterday = LocalDate.of(2026, 4, 27);
         Task task = fixedDateTask(102L, yesterday, true, yesterday.getDayOfMonth());
         when(taskRepository.findById(102L)).thenReturn(Optional.of(task));
 

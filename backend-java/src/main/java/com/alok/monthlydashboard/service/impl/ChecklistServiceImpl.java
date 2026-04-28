@@ -12,6 +12,7 @@ import com.alok.monthlydashboard.exception.ResourceNotFoundException;
 import com.alok.monthlydashboard.exception.ValidationException;
 import com.alok.monthlydashboard.repository.TaskCompletionRepository;
 import com.alok.monthlydashboard.repository.TaskRepository;
+import com.alok.monthlydashboard.service.AppDateProvider;
 import com.alok.monthlydashboard.service.ChecklistService;
 import com.alok.monthlydashboard.service.RecurrenceService;
 import org.springframework.stereotype.Service;
@@ -31,21 +32,24 @@ public class ChecklistServiceImpl implements ChecklistService {
     private final TaskRepository taskRepository;
     private final TaskCompletionRepository taskCompletionRepository;
     private final RecurrenceService recurrenceService;
+    private final AppDateProvider appDateProvider;
 
     public ChecklistServiceImpl(
             TaskRepository taskRepository,
             TaskCompletionRepository taskCompletionRepository,
-            RecurrenceService recurrenceService
+            RecurrenceService recurrenceService,
+            AppDateProvider appDateProvider
     ) {
         this.taskRepository = taskRepository;
         this.taskCompletionRepository = taskCompletionRepository;
         this.recurrenceService = recurrenceService;
+        this.appDateProvider = appDateProvider;
     }
 
     @Override
     @Transactional(readOnly = true)
     public TodayChecklistResponse getTodayChecklist() {
-        LocalDate today = LocalDate.now();
+        LocalDate today = appDateProvider.today();
 
         List<Task> activeTasks = taskRepository.findByIsActiveOrderByNameAsc(true);
         List<ChecklistItemResponse> items = new ArrayList<>();
@@ -98,7 +102,7 @@ public class ChecklistServiceImpl implements ChecklistService {
     public CompletionResponse completeTask(Long taskId, CompleteTaskRequest request) {
         Task task = getTaskOrThrow(taskId);
 
-        LocalDate today = LocalDate.now();
+        LocalDate today = appDateProvider.today();
         LocalDate occurrenceDate = request.occurrenceDate();
         LocalDate completionDate = request.completionDate();
 

@@ -11,6 +11,7 @@ import com.alok.monthlydashboard.entity.enums.Weekday;
 import com.alok.monthlydashboard.exception.ResourceNotFoundException;
 import com.alok.monthlydashboard.repository.TaskCompletionRepository;
 import com.alok.monthlydashboard.repository.TaskRepository;
+import com.alok.monthlydashboard.service.AppDateProvider;
 import com.alok.monthlydashboard.service.RecurrenceService;
 import org.springframework.stereotype.Service;
 import com.alok.monthlydashboard.common.enums.*;
@@ -28,20 +29,23 @@ public class RecurrenceServiceImpl implements RecurrenceService {
 
     private final TaskRepository taskRepository;
     private final TaskCompletionRepository taskCompletionRepository;
+    private final AppDateProvider appDateProvider;
 
     public RecurrenceServiceImpl(
             TaskRepository taskRepository,
-            TaskCompletionRepository taskCompletionRepository
+            TaskCompletionRepository taskCompletionRepository,
+            AppDateProvider appDateProvider
     ) {
         this.taskRepository = taskRepository;
         this.taskCompletionRepository = taskCompletionRepository;
+        this.appDateProvider = appDateProvider;
     }
 
     @Override
     public List<OccurrenceResponse> generateOccurrencesForMonth(Long taskId, int year, int month) {
         Task task = getTaskOrThrow(taskId);
         YearMonth targetMonth = YearMonth.of(year, month);
-        LocalDate today = LocalDate.now();
+        LocalDate today = appDateProvider.today();
 
         List<LocalDate> occurrenceDates = generateOccurrenceDates(task, targetMonth);
 

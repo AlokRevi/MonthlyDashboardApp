@@ -16,6 +16,7 @@ import com.alok.monthlydashboard.exception.ResourceNotFoundException;
 import com.alok.monthlydashboard.repository.CategoryRepository;
 import com.alok.monthlydashboard.repository.TaskCompletionRepository;
 import com.alok.monthlydashboard.repository.TaskRepository;
+import com.alok.monthlydashboard.service.AppDateProvider;
 import com.alok.monthlydashboard.service.HistoryService;
 import com.alok.monthlydashboard.service.RecurrenceService;
 import org.springframework.stereotype.Service;
@@ -37,23 +38,26 @@ public class HistoryServiceImpl implements HistoryService {
     private final TaskRepository taskRepository;
     private final TaskCompletionRepository taskCompletionRepository;
     private final RecurrenceService recurrenceService;
+    private final AppDateProvider appDateProvider;
 
     public HistoryServiceImpl(
             CategoryRepository categoryRepository,
             TaskRepository taskRepository,
             TaskCompletionRepository taskCompletionRepository,
-            RecurrenceService recurrenceService
+            RecurrenceService recurrenceService,
+            AppDateProvider appDateProvider
     ) {
         this.categoryRepository = categoryRepository;
         this.taskRepository = taskRepository;
         this.taskCompletionRepository = taskCompletionRepository;
         this.recurrenceService = recurrenceService;
+        this.appDateProvider = appDateProvider;
     }
 
     @Override
     public MonthlyDashboardResponse getPastMonth(int year, int month) {
         YearMonth targetMonth = YearMonth.of(year, month);
-        LocalDate today = LocalDate.now();
+        LocalDate today = appDateProvider.today();
 
         ScaleBarResponse scaleBar = buildScaleBar(targetMonth);
         List<DayStripItemResponse> dayStrip = buildDayStrip(targetMonth, today);
