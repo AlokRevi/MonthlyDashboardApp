@@ -488,6 +488,8 @@ input {
     width: 100%;
   }
 
+
+
   .quick-form,
   .card,
   .category-cleanup {
@@ -576,6 +578,163 @@ input {
   background: white;
   color: #1f2937;
   border: 1px solid #dbe3ef;
+}
+
+@media (max-width: 760px) {
+  .modal-actions {
+    flex-direction: column;
+  }
+}
+/* =========================================
+   CATEGORY COMPLETED TASK HOVER/TAP
+========================================= */
+
+.category-hover-row {
+  position: relative;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.category-summary-button {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+  background: transparent;
+  color: #1f2937;
+  padding: 0;
+  border-radius: 0;
+}
+
+.category-summary-button:hover {
+  background: transparent;
+}
+
+.category-arrow {
+  color: #64748b;
+  font-size: 12px;
+  margin-left: 8px;
+}
+
+.category-delete-button {
+  width: fit-content;
+  margin-top: 6px;
+  border: 1px solid #fecaca;
+  border-radius: 999px;
+  background: #fff1f2;
+  color: #be123c;
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.completed-category-popover {
+  display: none;
+  margin-top: 8px;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 8px;
+}
+
+/* Desktop hover opens completed list */
+@media (hover: hover) and (pointer: fine) {
+  .category-hover-row:hover .completed-category-popover {
+    display: block;
+  }
+}
+
+/* Mobile/touch arrow opens completed list */
+.category-hover-row.category-expanded .completed-category-popover {
+  display: block;
+}
+
+.completed-empty {
+  margin: 0;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.completed-task-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 5px 0;
+  border-top: 1px solid #f1f5f9;
+  font-size: 12px;
+}
+
+.completed-task-item:first-of-type {
+  border-top: none;
+}
+
+.completed-task-item strong {
+  color: #1f2937;
+}
+
+.completed-task-item span {
+  color: #64748b;
+}
+/* =========================================
+   EDIT TASK MODAL
+========================================= */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.edit-modal {
+  width: min(900px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 18px;
+  border: 1px solid #dbe3ef;
+  padding: 18px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.modal-header h2 {
+  margin: 0;
+}
+
+.modal-close {
+  width: auto;
+  background: white;
+  color: #1f2937;
+  border: 1px solid #dbe3ef;
+  border-radius: 999px;
+  padding: 6px 12px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.secondary-button {
+  background: white;
+  color: #1f2937;
+  border: 1px solid #dbe3ef;
+}
+
+.field-error {
+  color: #b91c1c;
+  font-size: 11px;
+  font-weight: 800;
 }
 
 @media (max-width: 760px) {

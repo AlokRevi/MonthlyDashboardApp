@@ -30,8 +30,6 @@ export class CategorySectionComponent {
   @Output() markComplete = new EventEmitter<{ taskId: number; occurrenceDate: string }>();
   @Output() undoComplete = new EventEmitter<{ taskId: number; occurrenceDate: string }>();
   @Output() deleteTask = new EventEmitter<number>();
-
-  // New: parent opens edit modal.
   @Output() editTask = new EventEmitter<number>();
 
   expandedTaskId: number | null = null;

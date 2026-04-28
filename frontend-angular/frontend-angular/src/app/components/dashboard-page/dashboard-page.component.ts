@@ -19,7 +19,9 @@ import {
   TaskResponse,
   RecurrenceType,
   IntervalUnit,
-  DashboardCategory
+  DashboardCategory,
+  DashboardOccurrence,
+  WeekOfMonth
 } from '../../models/dashboard.models';
 
 import { DashboardApiService } from '../../services/dashboard-api.service';
@@ -88,13 +90,201 @@ export class DashboardPageComponent implements OnInit {
     'SUNDAY'
   ];
 
-  weekOfMonthOptions = [
-    { value: 1, label: '1st' },
-    { value: 2, label: '2nd' },
-    { value: 3, label: '3rd' },
-    { value: 4, label: '4th' },
-    { value: 5, label: 'Last' }
+  weekOfMonthOptions: { value: WeekOfMonth; label: string }[] = [
+    { value: 'FIRST', label: '1st' },
+    { value: 'SECOND', label: '2nd' },
+    { value: 'THIRD', label: '3rd' },
+    { value: 'FOURTH', label: '4th' },
+    { value: 'LAST', label: 'Last' }
   ];
+
+  weekOfMonth: WeekOfMonth = 'LAST';
+
+  private getTodayString(): string {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+editModalOpen = false;
+editTaskId: number | null = null;
+editLoading = false;
+editSaving = false;
+
+editTaskCategoryId: number | null = null;
+editTaskName = '';
+editTaskDescription = '';
+editTaskStartDate = this.getTodayString();
+editTaskEndDate: string | null = null;
+editTaskRecurrenceType: RecurrenceType = 'FIXED_DATE';
+
+editTaskFixedDatesText = '';
+editFallbackToLastDay = true;
+
+editIntervalValue = 1;
+editIntervalUnit: IntervalUnit = 'WEEKS';
+
+editWeekday = 'FRIDAY';
+editWeekOfMonth: WeekOfMonth = 'LAST';
+
+openEditTaskModal(taskId: number): void {
+  this.editModalOpen = true;
+  this.editTaskId = taskId;
+  this.editLoading = true;
+  this.clearFieldErrors();
+
+  this.dashboardApi.getTask(taskId).subscribe({
+    next: (task) => {
+      this.populateEditForm(task);
+      this.editLoading = false;
+      this.cdr.markForCheck();
+    },
+    error: (error) => {
+      console.error('Load task failed:', error);
+      this.editLoading = false;
+      this.editModalOpen = false;
+      this.showError('Could not load task details.');
+    }
+  });
+}
+
+closeEditTaskModal(): void {
+  this.editModalOpen = false;
+  this.editTaskId = null;
+  this.editLoading = false;
+  this.editSaving = false;
+  this.clearFieldErrors();
+}
+
+private populateEditForm(task: TaskResponse): void {
+  this.editTaskCategoryId = task.categoryId;
+  this.editTaskName = task.name;
+  this.editTaskDescription = task.description ?? '';
+  this.editTaskStartDate = task.startDate || this.getTodayString();
+  this.editTaskEndDate = task.endDate;
+  this.editTaskRecurrenceType = task.recurrenceType;
+
+  this.editTaskFixedDatesText = task.rule?.fixedDates?.join(', ') ?? '';
+  this.editFallbackToLastDay = task.rule?.fallbackToLastDay ?? true;
+
+  this.editIntervalValue = task.rule?.intervalValue ?? 1;
+  this.editIntervalUnit = task.rule?.intervalUnit ?? 'WEEKS';
+
+  this.editWeekday = task.rule?.weekday ?? 'FRIDAY';
+  this.editWeekOfMonth = task.rule?.weekOfMonth ?? 'LAST';
+}
+
+private parseEditFixedDates(): number[] {
+  return this.editTaskFixedDatesText
+    .split(',')
+    .map(value => Number(value.trim()))
+    .filter(value => !Number.isNaN(value));
+}
+
+private validateEditTaskForm(): boolean {
+  this.clearFieldErrors();
+
+  if (!this.editTaskCategoryId) {
+    this.setFieldError('editTaskCategory', 'Please select a category.');
+  }
+
+  if (!this.editTaskName.trim()) {
+    this.setFieldError('editTaskName', 'Task name is required.');
+  }
+
+  if (!this.editTaskStartDate) {
+    this.setFieldError('editTaskStartDate', 'Start date is required.');
+  }
+
+  if (this.editTaskEndDate && this.editTaskEndDate < this.editTaskStartDate) {
+    this.setFieldError('editTaskEndDate', 'End date cannot be before start date.');
+  }
+
+  if (this.editTaskRecurrenceType === 'FIXED_DATE') {
+    const fixedDates = this.parseEditFixedDates();
+
+    if (fixedDates.length === 0) {
+      this.setFieldError('editFixedDates', 'Enter at least one date.');
+    }
+
+    if (fixedDates.some(date => date < 1 || date > 31)) {
+      this.setFieldError('editFixedDates', 'Each date must be between 1 and 31.');
+    }
+  }
+
+  if (this.editTaskRecurrenceType === 'INTERVAL' && this.editIntervalValue < 1) {
+    this.setFieldError('editIntervalValue', 'Interval must be at least 1.');
+  }
+
+  return Object.keys(this.fieldErrors).length === 0;
+}
+
+private buildUpdateTaskRequest(): UpdateTaskRequest {
+  const baseRequest = {
+    categoryId: Number(this.editTaskCategoryId),
+    name: this.editTaskName.trim(),
+    description: this.editTaskDescription.trim(),
+    recurrenceType: this.editTaskRecurrenceType,
+    startDate: this.editTaskStartDate,
+    endDate: this.editTaskEndDate || null
+  };
+
+  if (this.editTaskRecurrenceType === 'FIXED_DATE') {
+    return {
+      ...baseRequest,
+      recurrenceType: 'FIXED_DATE',
+      rule: {
+        fixedDates: this.parseEditFixedDates(),
+        fallbackToLastDay: this.editFallbackToLastDay
+      }
+    };
+  }
+
+  if (this.editTaskRecurrenceType === 'INTERVAL') {
+    return {
+      ...baseRequest,
+      recurrenceType: 'INTERVAL',
+      rule: {
+        intervalValue: this.editIntervalValue,
+        intervalUnit: this.editIntervalUnit
+      }
+    };
+  }
+
+  return {
+    ...baseRequest,
+    recurrenceType: 'WEEKDAY',
+    rule: {
+      weekday: this.editWeekday,
+      weekOfMonth: this.editWeekOfMonth
+    }
+  };
+}
+
+onUpdateTask(): void {
+  if (!this.editTaskId || !this.validateEditTaskForm()) {
+    this.cdr.markForCheck();
+    return;
+  }
+
+  this.editSaving = true;
+
+  this.dashboardApi.updateTask(
+    this.editTaskId,
+    this.buildUpdateTaskRequest()
+  ).subscribe({
+    next: () => {
+      this.editSaving = false;
+      this.closeEditTaskModal();
+      this.showSuccess('Task updated.');
+      this.loadDashboard();
+    },
+    error: (error) => {
+      console.error('Update task failed:', error);
+      this.editSaving = false;
+      this.showError('Could not update task.');
+    }
+  });
+}
+
 
   // --------------------------------
   // Backend data
@@ -124,7 +314,7 @@ export class DashboardPageComponent implements OnInit {
   newTaskCategoryId: number | null = null;
   newTaskName = '';
   newTaskDescription = '';
-  newTaskStartDate = '2026-01-01';
+newTaskStartDate = this.getTodayString();
   newTaskEndDate: string | null = null;
   newTaskRecurrenceType: RecurrenceType = 'FIXED_DATE';
   taskSaving = false;
@@ -149,7 +339,7 @@ editFallbackToLastDay = true;
 editIntervalValue = 1;
 editIntervalUnit: IntervalUnit = 'WEEKS';
 editWeekday = 'FRIDAY';
-editWeekOfMonth = 5;
+editWeekOfMonth: WeekOfMonth = 'LAST';
 
 openEditTaskModal(taskId: number): void {
   this.editModalOpen = true;
@@ -311,6 +501,50 @@ onUpdateTask(): void {
   });
 }
 
+// Mobile/touch state for category completed-task dropdown.
+expandedCategoryId: number | null = null;
+
+toggleCategoryCompleted(categoryId: number): void {
+  this.expandedCategoryId = this.expandedCategoryId === categoryId ? null : categoryId;
+}
+
+isCategoryExpanded(categoryId: number): boolean {
+  return this.expandedCategoryId === categoryId;
+}
+
+/**
+ * Finds completed task occurrences for the current visible month.
+ * This uses the already-loaded monthly dashboard response.
+ */
+getCompletedTasksForCategory(categoryId: number): {
+  taskName: string;
+  occurrenceDate: string;
+}[] {
+  const category = this.dashboard?.categories.find(
+    item => item.categoryId === categoryId
+  );
+
+  if (!category) {
+    return [];
+  }
+
+  const completed: { taskName: string; occurrenceDate: string }[] = [];
+
+  category.tasks.forEach(task => {
+    task.occurrences
+      .filter(occurrence => occurrence.status === 'COMPLETED')
+      .forEach(occurrence => {
+        completed.push({
+          taskName: task.taskName,
+          occurrenceDate: occurrence.occurrenceDate
+        });
+      });
+  });
+
+  return completed.sort((a, b) =>
+    a.occurrenceDate.localeCompare(b.occurrenceDate)
+  );
+}
 
 
 
@@ -324,7 +558,7 @@ onUpdateTask(): void {
 
   // Weekday recurrence
   weekday = 'FRIDAY';
-  weekOfMonth = 5;
+  weekOfMonth: WeekOfMonth = 'LAST';
 
   constructor(
     private dashboardApi: DashboardApiService,
@@ -610,8 +844,9 @@ onUpdateTask(): void {
     }
 
     if (
-      this.newTaskRecurrenceType === 'WEEKDAY' &&
-      (this.weekOfMonth < 1 || this.weekOfMonth > 5)
+      this.newTaskRecurrenceType === 'WEEKDAY' && (!this.weekOfMonth) {
+       this.setFieldError('weekOfMonth', 'Choose 1st, 2nd, 3rd, 4th, or Last.');
+     }
     ) {
       this.setFieldError('weekOfMonth', 'Choose 1st, 2nd, 3rd, 4th, or Last.');
     }
@@ -689,7 +924,7 @@ onUpdateTask(): void {
         this.intervalValue = 1;
         this.intervalUnit = 'WEEKS';
         this.weekday = 'FRIDAY';
-        this.weekOfMonth = 5;
+        this.weekOfMonth: WeekOfMonth = 'LAST';
         this.taskSaving = false;
 
         this.showSuccess('Task created.');

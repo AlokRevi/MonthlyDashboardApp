@@ -36,7 +36,7 @@ export interface DashboardCategory {
 export interface DashboardTask {
   taskId: number;
   taskName: string;
-  recurrenceType: string;
+  recurrenceType: RecurrenceType;
   occurrences: DashboardOccurrence[];
 }
 
@@ -100,13 +100,18 @@ export interface CategoryResponse {
 export type RecurrenceType = 'FIXED_DATE' | 'INTERVAL' | 'WEEKDAY';
 export type IntervalUnit = 'DAYS' | 'WEEKS';
 
+// API spec uses FIRST/SECOND/THIRD/FOURTH/LAST.
+export type WeekOfMonth = 'FIRST' | 'SECOND' | 'THIRD' | 'FOURTH' | 'LAST';
+
 export interface TaskRuleRequest {
   fixedDates?: number[];
   fallbackToLastDay?: boolean;
+
   intervalValue?: number;
   intervalUnit?: IntervalUnit;
+
   weekday?: string;
-  weekOfMonth?: number;
+  weekOfMonth?: WeekOfMonth;
 }
 
 export interface CreateTaskRequest {

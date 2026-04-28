@@ -1,30 +1,22 @@
 <section class="today-card">
-  <!-- Header stays compact so the side panel does not become too tall -->
+  <!-- Header -->
   <div class="today-header">
     <div>
       <h2>Today Checklist</h2>
-
-      @if (checklist) {
-      <p>{{ checklist.items.length }} item(s)</p>
-      }
+      <p>{{ totalCount }} item(s)</p>
     </div>
   </div>
 
-  @if (checklist && checklist.items.length > 0) {
+  @if (checklist && totalCount > 0) {
   <div class="checklist-list">
-    @for (item of checklist.items; track trackByChecklistItem($index, item)) {
+
+    <!-- Due today items stay visible individually -->
+    @for (item of dueTodayItems; track trackByChecklistItem($index, item)) {
     <article class="checklist-row">
-      <!-- Left section: task name + category/date info -->
       <div class="item-main">
         <div class="item-title-line">
           <strong>{{ item.taskName }}</strong>
-
-          <span
-            class="status-pill"
-            [class.status-due]="item.status === 'DUE_TODAY'"
-            [class.status-overdue]="item.status === 'OVERDUE'">
-            {{ getStatusLabel(item.status) }}
-          </span>
+          <span class="status-pill status-due">Due today</span>
         </div>
 
         <div class="item-meta">
@@ -34,7 +26,6 @@
         </div>
       </div>
 
-      <!-- Right section: compact action button -->
       <button
         type="button"
         class="complete-button"
@@ -43,10 +34,55 @@
       </button>
     </article>
     }
+
+    <!-- Overdue items collapsed into one row -->
+    @if (overdueItems.length > 0) {
+    <article
+      class="checklist-row overdue-group"
+      [class.expanded]="overdueExpanded">
+
+      <div class="item-main">
+        <div class="item-title-line">
+          <strong>{{ overdueItems.length }} overdue task(s)</strong>
+          <span class="status-pill status-overdue">Overdue</span>
+        </div>
+
+        <div class="item-meta">
+          <span>Hover or expand to review missed tasks</span>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="expand-button"
+        (click)="toggleOverdueList()">
+        {{ overdueExpanded ? '▴' : '▾' }}
+      </button>
+
+      <!-- Desktop: shows on hover. Mobile: shows when expanded. -->
+      <div class="overdue-popover">
+        @for (item of overdueItems; track trackByChecklistItem($index, item)) {
+        <div class="overdue-item">
+          <div>
+            <strong>{{ item.taskName }}</strong>
+            <p>{{ item.categoryName }} • {{ item.occurrenceDate }}</p>
+          </div>
+
+          <button
+            type="button"
+            class="mini-complete-button"
+            (click)="onMarkComplete(item)">
+            ✓
+          </button>
+        </div>
+        }
+      </div>
+    </article>
+    }
   </div>
   }
 
-  @if (checklist && checklist.items.length === 0) {
+  @if (checklist && totalCount === 0) {
   <div class="empty-state">
     <div class="empty-icon">✓</div>
     <strong>All clear for today</strong>

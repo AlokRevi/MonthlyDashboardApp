@@ -15,18 +15,32 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TodayChecklistComponent {
-  // Data received from DashboardPageComponent.
-  // This contains today's date and due/overdue checklist items.
   @Input() checklist: TodayChecklistResponse | null = null;
 
-  // Sends selected task occurrence back to the parent component.
-  // Parent component will call the backend completion API.
   @Output() markComplete = new EventEmitter<{
     taskId: number;
     occurrenceDate: string;
   }>();
 
-  // Emits the task occurrence that should be marked complete.
+  // Mobile/touch state for showing overdue list.
+  overdueExpanded = false;
+
+  get dueTodayItems(): ChecklistItem[] {
+    return this.checklist?.items.filter(item => item.status === 'DUE_TODAY') ?? [];
+  }
+
+  get overdueItems(): ChecklistItem[] {
+    return this.checklist?.items.filter(item => item.status === 'OVERDUE') ?? [];
+  }
+
+  get totalCount(): number {
+    return this.checklist?.items.length ?? 0;
+  }
+
+  toggleOverdueList(): void {
+    this.overdueExpanded = !this.overdueExpanded;
+  }
+
   onMarkComplete(item: ChecklistItem): void {
     this.markComplete.emit({
       taskId: item.taskId,
@@ -34,20 +48,6 @@ export class TodayChecklistComponent {
     });
   }
 
-  // Makes backend enum text easier to read in the UI.
-  getStatusLabel(status: string): string {
-    if (status === 'DUE_TODAY') {
-      return 'Due today';
-    }
-
-    if (status === 'OVERDUE') {
-      return 'Overdue';
-    }
-
-    return status;
-  }
-
-  // Helps Angular render list rows efficiently.
   trackByChecklistItem(index: number, item: ChecklistItem): string {
     return `${item.taskId}-${item.occurrenceDate}`;
   }

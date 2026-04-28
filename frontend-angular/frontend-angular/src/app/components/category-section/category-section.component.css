@@ -59,14 +59,37 @@
   font-weight: 600;
 }
 
+.task-title-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 /* Hidden action buttons by default */
+
 .task-actions {
   display: flex;
-  gap: 6px;
+  align-items: center;
+  gap: 4px;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.15s ease;
 }
+
+
+.icon-task-button {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+
 
 .edit-task-button,
 .delete-task-button {
@@ -84,6 +107,7 @@
   color: #1d4ed8;
 }
 
+
 .delete-task-button {
   border: 1px solid #fecaca;
   background: #fff1f2;
@@ -98,7 +122,7 @@
   background: #ffe4e6;
 }
 
-/* Desktop: show actions on hover */
+/* Desktop: show action icons when hovering over the task row */
 @media (hover: hover) and (pointer: fine) {
   .task-row:hover .task-actions {
     opacity: 1;
@@ -106,7 +130,7 @@
   }
 }
 
-/* Mobile/touch: show actions after tapping row */
+/* Mobile/touch: show action icons after tapping the task row */
 .task-row-expanded .task-actions {
   opacity: 1;
   pointer-events: auto;

@@ -12,22 +12,28 @@
       (click)="toggleTaskActions(task.taskId)">
 
       <div class="task-info">
-        <strong>{{ task.taskName }}</strong>
+        <div class="task-title-line">
+          <strong>{{ task.taskName }}</strong>
 
-        <div class="task-actions">
-          <button
-            type="button"
-            class="edit-task-button"
-            (click)="editTask.emit(task.taskId); $event.stopPropagation()">
-            Edit
-          </button>
+          <div class="task-actions">
+            <button
+              type="button"
+              class="icon-task-button edit-task-button"
+              title="Edit task"
+              aria-label="Edit task"
+              (click)="editTask.emit(task.taskId); $event.stopPropagation()">
+              ✎
+            </button>
 
-          <button
-            type="button"
-            class="delete-task-button"
-            (click)="deleteTask.emit(task.taskId); $event.stopPropagation()">
-            Delete
-          </button>
+            <button
+              type="button"
+              class="icon-task-button delete-task-button"
+              title="Delete task"
+              aria-label="Delete task"
+              (click)="deleteTask.emit(task.taskId); $event.stopPropagation()">
+              ×
+            </button>
+          </div>
         </div>
       </div>
 

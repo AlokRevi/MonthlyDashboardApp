@@ -1,4 +1,3 @@
-/* Main checklist card inside the right-side panel */
 .today-card {
   background: white;
   border: 1px solid #dbe3ef;
@@ -7,11 +6,7 @@
   box-shadow: 0 14px 35px rgba(15, 23, 42, 0.08);
 }
 
-/* Compact header */
 .today-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 10px;
 }
 
@@ -28,15 +23,14 @@
   font-weight: 700;
 }
 
-/* Vertical list with smaller gaps */
 .checklist-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-/* One compact checklist entry */
 .checklist-row {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 34px;
   align-items: center;
@@ -47,12 +41,10 @@
   padding: 9px 10px;
 }
 
-/* Main text block */
 .item-main {
   min-width: 0;
 }
 
-/* Task name and status sit on one line */
 .item-title-line {
   display: flex;
   align-items: center;
@@ -64,12 +56,8 @@
   color: #1f2937;
   font-size: 13px;
   line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-/* Category + date info */
 .item-meta {
   display: flex;
   align-items: center;
@@ -80,46 +68,96 @@
   font-weight: 700;
 }
 
-/* Small status label */
 .status-pill {
-  flex: 0 0 auto;
   border-radius: 999px;
   padding: 2px 7px;
   font-size: 10px;
   font-weight: 800;
 }
 
-/* Blue = due today */
 .status-due {
   background: #dbeafe;
   color: #1d4ed8;
 }
 
-/* Orange = overdue */
 .status-overdue {
   background: #ffedd5;
   color: #c2410c;
 }
 
-/* Small square action button */
-.complete-button {
-  width: 34px;
-  height: 34px;
+.complete-button,
+.expand-button,
+.mini-complete-button {
   border: 1px solid #bbf7d0;
   border-radius: 10px;
   background: #dcfce7;
   color: #166534;
-  font-size: 16px;
   font-weight: 900;
   cursor: pointer;
   padding: 0;
 }
 
-.complete-button:hover {
-  background: #bbf7d0;
+.complete-button,
+.expand-button {
+  width: 34px;
+  height: 34px;
 }
 
-/* Empty checklist state */
+.expand-button {
+  background: #fff7ed;
+  border-color: #fed7aa;
+  color: #c2410c;
+}
+
+.mini-complete-button {
+  width: 28px;
+  height: 28px;
+}
+
+/* Hidden overdue list */
+.overdue-popover {
+  display: none;
+  grid-column: 1 / -1;
+  margin-top: 8px;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 8px;
+}
+
+/* Desktop hover opens list */
+@media (hover: hover) and (pointer: fine) {
+  .overdue-group:hover .overdue-popover {
+    display: block;
+  }
+}
+
+/* Mobile/touch opens list using arrow */
+.overdue-group.expanded .overdue-popover {
+  display: block;
+}
+
+.overdue-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-top: 1px solid #f1f5f9;
+}
+
+.overdue-item:first-child {
+  border-top: none;
+}
+
+.overdue-item strong {
+  font-size: 12px;
+}
+
+.overdue-item p {
+  margin: 2px 0 0;
+  color: #64748b;
+  font-size: 11px;
+}
+
 .empty-state {
   text-align: center;
   padding: 18px 8px;
