@@ -1,6 +1,14 @@
 # Monthly Dashboard
 
+A structured monthly task system that converts recurrence rules into trackable occurrences, reducing cognitive load.
+
 Monthly Dashboard is a Spring Boot + Angular app for tracking recurring monthly tasks, due-today items, overdue items, and completed task occurrences.
+
+## System Flow
+
+```text
+User defines rules -> system generates occurrences -> user completes -> system tracks history
+```
 
 ## Active App Paths
 
@@ -10,11 +18,11 @@ Monthly Dashboard is a Spring Boot + Angular app for tracking recurring monthly 
 
 The folders under `archive/frontend-prototypes` are kept only for reference. New frontend work should happen in `frontend-angular/frontend-angular`.
 
-## Run The Backend
+## Run the Backend
 
 From the repo root:
 
-```powershell
+```bash
 cd backend-java
 mvn spring-boot:run
 ```
@@ -31,11 +39,11 @@ The default local SQLite database is:
 backend-java/monthly-dashboard.db
 ```
 
-## Run The Frontend
+## Run the Frontend
 
 From the repo root:
 
-```powershell
+```bash
 cd frontend-angular/frontend-angular
 npm install
 npm start
@@ -69,7 +77,7 @@ backend-java/src/main/resources/application.properties
 
 For deployment, set:
 
-```powershell
+```bash
 $env:APP_CORS_ALLOWED_ORIGINS="https://your-domain.com"
 ```
 
@@ -77,14 +85,14 @@ $env:APP_CORS_ALLOWED_ORIGINS="https://your-domain.com"
 
 Backend:
 
-```powershell
+```bash
 cd backend-java
 mvn test
 ```
 
 Frontend:
 
-```powershell
+```bash
 cd frontend-angular/frontend-angular
 npm run build
 ```
