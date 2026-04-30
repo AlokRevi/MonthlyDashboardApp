@@ -6,6 +6,7 @@ import {
   CategoryResponse,
   IntervalUnit,
   RecurrenceType,
+  TaskEditScope,
   TaskResponse,
   UpdateTaskRequest,
   WeekOfMonth
@@ -25,6 +26,7 @@ export class TaskEditModalComponent implements OnChanges {
   @Input() loading = false;
   @Input() saving = false;
   @Input() task: TaskResponse | null = null;
+  @Input() selectedOccurrenceDate: string | null = null;
   @Input() availableCategories: CategoryResponse[] = [];
   @Input() recurrenceOptions: { value: RecurrenceType; label: string }[] = [];
   @Input() intervalUnitOptions: { value: IntervalUnit; label: string }[] = [];
@@ -48,6 +50,8 @@ export class TaskEditModalComponent implements OnChanges {
   editIntervalUnit: IntervalUnit = 'WEEKS';
   editWeekday = 'FRIDAY';
   editWeekOfMonth: WeekOfMonth = 'LAST';
+  editScope: TaskEditScope = 'THIS_AND_FOLLOWING';
+  editSelectedOccurrenceDate = '';
 
   constructor(private dateFormat: DateFormatService) {
     this.editTaskStartDate = this.dateFormat.toIsoDate();
@@ -56,6 +60,10 @@ export class TaskEditModalComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['task'] && this.task) {
       this.populateEditForm(this.task);
+    }
+
+    if (changes['selectedOccurrenceDate']) {
+      this.editSelectedOccurrenceDate = this.selectedOccurrenceDate ?? this.editSelectedOccurrenceDate;
     }
   }
 
@@ -81,6 +89,8 @@ export class TaskEditModalComponent implements OnChanges {
     this.editIntervalUnit = task.rule?.intervalUnit ?? 'WEEKS';
     this.editWeekday = task.rule?.weekday ?? 'FRIDAY';
     this.editWeekOfMonth = task.rule?.weekOfMonth ?? 'LAST';
+    this.editScope = 'THIS_AND_FOLLOWING';
+    this.editSelectedOccurrenceDate = this.selectedOccurrenceDate ?? task.startDate;
   }
 
   private validateEditTaskForm(): boolean {
@@ -100,6 +110,18 @@ export class TaskEditModalComponent implements OnChanges {
 
     if (this.editTaskEndDate && this.editTaskEndDate < this.editTaskStartDate) {
       this.fieldErrors['editTaskEndDate'] = 'End date cannot be before start date.';
+    }
+
+    if (!this.editSelectedOccurrenceDate) {
+      this.fieldErrors['editSelectedOccurrenceDate'] = 'Choose the occurrence date to apply changes from.';
+    }
+
+    if (this.editSelectedOccurrenceDate && this.editSelectedOccurrenceDate < this.editTaskStartDate) {
+      this.fieldErrors['editSelectedOccurrenceDate'] = 'Apply-from date cannot be before the task start date.';
+    }
+
+    if (this.editTaskEndDate && this.editSelectedOccurrenceDate && this.editTaskEndDate < this.editSelectedOccurrenceDate) {
+      this.fieldErrors['editTaskEndDate'] = 'End date cannot be before the apply-from date.';
     }
 
     if (this.editTaskRecurrenceType === 'FIXED_DATE') {
@@ -129,7 +151,9 @@ export class TaskEditModalComponent implements OnChanges {
       recurrenceType: this.editTaskRecurrenceType,
       startDate: this.editTaskStartDate,
       endDate: this.editTaskEndDate || null,
-      isActive: true
+      isActive: true,
+      editScope: this.editScope,
+      selectedOccurrenceDate: this.editSelectedOccurrenceDate
     };
 
     if (this.editTaskRecurrenceType === 'FIXED_DATE') {

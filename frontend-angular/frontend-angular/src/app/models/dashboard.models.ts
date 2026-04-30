@@ -139,6 +139,7 @@ export type FeelsLikeLabel =
 
 export type RecurrenceType = 'FIXED_DATE' | 'INTERVAL' | 'WEEKDAY';
 export type IntervalUnit = 'DAYS' | 'WEEKS' | 'MONTHS';
+export type TaskEditScope = 'THIS_AND_FOLLOWING' | 'ALL_FUTURE';
 
 // API spec uses FIRST/SECOND/THIRD/FOURTH/LAST.
 export type WeekOfMonth = 'FIRST' | 'SECOND' | 'THIRD' | 'FOURTH' | 'LAST';
@@ -172,6 +173,8 @@ export interface UpdateTaskRequest {
   startDate: string;
   endDate: string | null;
   isActive?: boolean;
+  editScope?: TaskEditScope;
+  selectedOccurrenceDate?: string;
   rule: TaskRuleRequest;
 }
 

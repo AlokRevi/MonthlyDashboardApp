@@ -31,6 +31,7 @@ export class DashboardPageStateService {
 
   editModalOpen = signal(false);
   editTaskId = signal<number | null>(null);
+  editOccurrenceDate = signal<string | null>(null);
   editTask = signal<TaskResponse | null>(null);
   editLoading = signal(false);
   editSaving = signal(false);
@@ -178,9 +179,13 @@ export class DashboardPageStateService {
     });
   }
 
-  openEditTaskModal(taskId: number): void {
+  openEditTaskModal(event: number | { taskId: number; occurrenceDate: string | null }): void {
+    const taskId = typeof event === 'number' ? event : event.taskId;
+    const occurrenceDate = typeof event === 'number' ? null : event.occurrenceDate;
+
     this.editModalOpen.set(true);
     this.editTaskId.set(taskId);
+    this.editOccurrenceDate.set(occurrenceDate);
     this.editTask.set(null);
     this.editLoading.set(true);
 
@@ -201,6 +206,7 @@ export class DashboardPageStateService {
   closeEditTaskModal(): void {
     this.editModalOpen.set(false);
     this.editTaskId.set(null);
+    this.editOccurrenceDate.set(null);
     this.editTask.set(null);
     this.editLoading.set(false);
     this.editSaving.set(false);

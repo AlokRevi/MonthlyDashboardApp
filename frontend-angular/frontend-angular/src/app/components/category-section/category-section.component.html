@@ -23,7 +23,7 @@
               class="icon-task-button edit-task-button"
               title="Edit task"
               aria-label="Edit task"
-              (click)="editTask.emit(task.taskId); $event.stopPropagation()">
+              (click)="onEditTaskClicked(task); $event.stopPropagation()">
               ✎
             </button>
 

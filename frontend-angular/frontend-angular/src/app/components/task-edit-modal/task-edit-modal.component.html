@@ -64,6 +64,24 @@
       </label>
     </div>
 
+    <div class="form-row scope-row">
+      <label>
+        Apply Changes
+        <select [(ngModel)]="editScope">
+          <option value="THIS_AND_FOLLOWING">This and following occurrences</option>
+          <option value="ALL_FUTURE">All future occurrences</option>
+        </select>
+      </label>
+
+      <label>
+        Apply From
+        <input type="date" [(ngModel)]="editSelectedOccurrenceDate" />
+        @if (fieldErrors['editSelectedOccurrenceDate']) {
+        <span class="field-error">{{ fieldErrors['editSelectedOccurrenceDate'] }}</span>
+        }
+      </label>
+    </div>
+
     @if (editTaskRecurrenceType === 'FIXED_DATE') {
     <div class="form-row recurrence-row">
       <label>

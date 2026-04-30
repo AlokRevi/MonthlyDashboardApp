@@ -2,6 +2,7 @@ package com.alok.monthlydashboard.service;
 
 import com.alok.monthlydashboard.common.enums.IntervalUnit;
 import com.alok.monthlydashboard.common.enums.RecurrenceType;
+import com.alok.monthlydashboard.common.enums.TaskEditScope;
 import com.alok.monthlydashboard.common.enums.WeekOfMonth;
 import com.alok.monthlydashboard.common.enums.Weekday;
 import com.alok.monthlydashboard.dto.dashboard.MonthlyDashboardResponse;
@@ -31,6 +32,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class TaskEditRegressionTest {
@@ -161,6 +164,72 @@ class TaskEditRegressionTest {
                         }));
     }
 
+    @Test
+    void thisAndFollowingEditSplitsTaskAndPreservesPastCompletionOnOriginalTask() {
+        TaskCompletion completion = new TaskCompletion();
+        completion.setTask(task);
+        completion.setOccurrenceDate(LocalDate.of(2026, 4, 15));
+        completion.setCompletionDate(LocalDate.of(2026, 4, 15));
+        task.addCompletion(completion);
+
+        taskService.updateTask(100L, scopedUpdateRequest(
+                TaskEditScope.THIS_AND_FOLLOWING,
+                LocalDate.of(2026, 5, 15),
+                2L,
+                RecurrenceType.INTERVAL,
+                new TaskRuleRequest(null, 2, IntervalUnit.WEEKS, null, null, null)
+        ));
+
+        assertThat(task.getEndDate()).isEqualTo(LocalDate.of(2026, 5, 14));
+        assertThat(task.getCompletions())
+                .singleElement()
+                .satisfies(savedCompletion -> {
+                    assertThat(savedCompletion.getTask()).isSameAs(task);
+                    assertThat(savedCompletion.getOccurrenceDate()).isEqualTo(LocalDate.of(2026, 4, 15));
+                    assertThat(savedCompletion.getCompletionDate()).isEqualTo(LocalDate.of(2026, 4, 15));
+                });
+
+        verify(taskRepository, times(2)).save(any(Task.class));
+    }
+
+    @Test
+    void thisAndFollowingEditCreatesSuccessorTaskStartingAtSelectedOccurrence() {
+        taskService.updateTask(100L, scopedUpdateRequest(
+                TaskEditScope.THIS_AND_FOLLOWING,
+                LocalDate.of(2026, 5, 15),
+                2L,
+                RecurrenceType.INTERVAL,
+                new TaskRuleRequest(null, 2, IntervalUnit.WEEKS, null, null, null)
+        ));
+
+        Mockito.verify(taskRepository, times(1)).save(Mockito.argThat(savedTask ->
+                savedTask.getStartDate().equals(LocalDate.of(2026, 5, 15))
+                        && savedTask.getEndDate() == null
+                        && savedTask.getCategory().equals(errands)
+                        && savedTask.getRecurrenceType() == RecurrenceType.INTERVAL
+                        && savedTask.getRecurrenceRule().getIntervalValue().equals(2)
+                        && savedTask.getRecurrenceRule().getIntervalUnit()
+                        == com.alok.monthlydashboard.entity.enums.IntervalUnit.WEEKS
+        ));
+    }
+
+    @Test
+    void allFutureScopeUsesSameSafeSplitBehaviorWithoutRewritingPastTask() {
+        taskService.updateTask(100L, scopedUpdateRequest(
+                TaskEditScope.ALL_FUTURE,
+                LocalDate.of(2026, 5, 15),
+                1L,
+                RecurrenceType.FIXED_DATE,
+                new TaskRuleRequest(List.of(20), null, null, null, null, true)
+        ));
+
+        assertThat(task.getEndDate()).isEqualTo(LocalDate.of(2026, 5, 14));
+        assertThat(task.getFixedDates())
+                .singleElement()
+                .extracting(TaskFixedDate::getDayOfMonth)
+                .isEqualTo(15);
+    }
+
     private List<Integer> daysInApril() {
         return recurrenceService.generateOccurrencesForMonth(100L, 2026, 4)
                 .stream()
@@ -190,6 +259,29 @@ class TaskEditRegressionTest {
                 LocalDate.of(2026, 4, 1),
                 null,
                 isActive,
+                null,
+                null,
+                rule
+        );
+    }
+
+    private UpdateTaskRequest scopedUpdateRequest(
+            TaskEditScope editScope,
+            LocalDate selectedOccurrenceDate,
+            Long categoryId,
+            RecurrenceType recurrenceType,
+            TaskRuleRequest rule
+    ) {
+        return new UpdateTaskRequest(
+                categoryId,
+                "Edited Task",
+                "Updated",
+                recurrenceType,
+                LocalDate.of(2026, 4, 1),
+                null,
+                true,
+                editScope,
+                selectedOccurrenceDate,
                 rule
         );
     }

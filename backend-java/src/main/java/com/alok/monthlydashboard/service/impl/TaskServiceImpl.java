@@ -1,6 +1,7 @@
 package com.alok.monthlydashboard.service.impl;
 
 import com.alok.monthlydashboard.common.enums.RecurrenceType;
+import com.alok.monthlydashboard.common.enums.TaskEditScope;
 import com.alok.monthlydashboard.dto.task.CreateTaskRequest;
 import com.alok.monthlydashboard.dto.task.TaskDetailResponse;
 import com.alok.monthlydashboard.dto.task.TaskMutationResponse;
@@ -114,11 +115,21 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskMutationResponse updateTask(Long taskId, UpdateTaskRequest request) {
-        validateDates(request.startDate(), request.endDate());
+        if (request.editScope() != null && request.selectedOccurrenceDate() == null) {
+            throw new ValidationException("selectedOccurrenceDate is required for scoped task edits");
+        }
+        LocalDate effectiveStartDate = request.editScope() == null
+                ? request.startDate()
+                : request.selectedOccurrenceDate();
+        validateDates(effectiveStartDate, request.endDate());
         TaskValidationHelper.validateRule(request.recurrenceType(), request.rule());
 
         Task task = getTaskOrThrow(taskId);
         Category category = getCategoryOrThrow(request.categoryId());
+
+        if (request.editScope() != null) {
+            return updateScopedTask(task, category, request);
+        }
 
         boolean nextActiveState = request.isActive() == null ? task.isActive() : request.isActive();
         boolean activatingInactiveTask = !task.isActive() && nextActiveState;
@@ -159,6 +170,48 @@ public class TaskServiceImpl implements TaskService {
                 saved.getId(),
                 saved.isActive(),
                 "Task updated successfully",
+                LocalDateTime.now()
+        );
+    }
+
+    private TaskMutationResponse updateScopedTask(Task task, Category category, UpdateTaskRequest request) {
+        if (request.editScope() != TaskEditScope.THIS_AND_FOLLOWING
+                && request.editScope() != TaskEditScope.ALL_FUTURE) {
+            throw new ValidationException("Unsupported task edit scope");
+        }
+        if (request.selectedOccurrenceDate() == null) {
+            throw new ValidationException("selectedOccurrenceDate is required for scoped task edits");
+        }
+        if (request.selectedOccurrenceDate().isBefore(task.getStartDate())) {
+            throw new ValidationException("selectedOccurrenceDate must be on or after the task startDate");
+        }
+        if (task.getEndDate() != null && request.selectedOccurrenceDate().isAfter(task.getEndDate())) {
+            throw new ValidationException("selectedOccurrenceDate must be on or before the task endDate");
+        }
+
+        if (request.selectedOccurrenceDate().isEqual(task.getStartDate())) {
+            applyTaskUpdate(task, category, request, request.selectedOccurrenceDate());
+            Task saved = taskRepository.save(task);
+
+            return new TaskMutationResponse(
+                    saved.getId(),
+                    saved.isActive(),
+                    "Task updated successfully",
+                    LocalDateTime.now()
+            );
+        }
+
+        task.setEndDate(request.selectedOccurrenceDate().minusDays(1));
+        taskRepository.save(task);
+
+        Task successor = new Task();
+        applyTaskUpdate(successor, category, request, request.selectedOccurrenceDate());
+        Task savedSuccessor = taskRepository.save(successor);
+
+        return new TaskMutationResponse(
+                savedSuccessor.getId(),
+                savedSuccessor.isActive(),
+                "Task split and future occurrences updated successfully",
                 LocalDateTime.now()
         );
     }
@@ -252,6 +305,39 @@ public class TaskServiceImpl implements TaskService {
         TaskRecurrenceRule rule = new TaskRecurrenceRule();
         applyRuleValues(rule, request);
         return rule;
+    }
+
+    private void applyTaskUpdate(
+            Task task,
+            Category category,
+            UpdateTaskRequest request,
+            LocalDate startDate
+    ) {
+        boolean nextActiveState = request.isActive() == null ? task.isActive() : request.isActive();
+
+        task.setCategory(category);
+        task.setName(request.name());
+        task.setDescription(request.description());
+        task.setRecurrenceType(request.recurrenceType());
+        task.setStartDate(startDate);
+        task.setEndDate(request.endDate());
+        task.setActive(nextActiveState);
+
+        TaskRecurrenceRule rule = task.getRecurrenceRule();
+        if (rule == null) {
+            rule = new TaskRecurrenceRule();
+            task.setRecurrenceRule(rule);
+        }
+        applyRuleValues(rule, request.rule());
+
+        task.clearFixedDates();
+        if (request.recurrenceType() == RecurrenceType.FIXED_DATE) {
+            for (Integer day : request.rule().fixedDates()) {
+                TaskFixedDate fixedDate = new TaskFixedDate();
+                fixedDate.setDayOfMonth(day);
+                task.addFixedDate(fixedDate);
+            }
+        }
     }
 
     private void applyRuleValues(TaskRecurrenceRule rule, TaskRuleRequest request) {

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import com.alok.monthlydashboard.common.enums.RecurrenceType;
+import com.alok.monthlydashboard.common.enums.TaskEditScope;
 import java.time.LocalDate;
 
 public record UpdateTaskRequest(
@@ -27,6 +28,10 @@ public record UpdateTaskRequest(
         LocalDate endDate,
 
         Boolean isActive,
+
+        TaskEditScope editScope,
+
+        LocalDate selectedOccurrenceDate,
 
         @Valid
         @NotNull

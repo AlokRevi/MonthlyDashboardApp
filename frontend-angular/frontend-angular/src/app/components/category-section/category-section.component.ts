@@ -30,7 +30,7 @@ export class CategorySectionComponent {
   @Output() markComplete = new EventEmitter<{ taskId: number; occurrenceDate: string }>();
   @Output() undoComplete = new EventEmitter<{ taskId: number; occurrenceDate: string }>();
   @Output() deleteTask = new EventEmitter<number>();
-  @Output() editTask = new EventEmitter<number>();
+  @Output() editTask = new EventEmitter<{ taskId: number; occurrenceDate: string | null }>();
 
   expandedTaskId: number | null = null;
   private readonly todayIso = this.toIsoDate(new Date());
@@ -108,6 +108,13 @@ export class CategorySectionComponent {
     });
   }
 
+  onEditTaskClicked(task: DashboardTask): void {
+    this.editTask.emit({
+      taskId: task.taskId,
+      occurrenceDate: this.getDefaultEditOccurrenceDate(task)
+    });
+  }
+
   trackByCategory(index: number, category: DashboardCategory): number {
     return category.categoryId;
   }
@@ -129,6 +136,15 @@ export class CategorySectionComponent {
     const todayTime = this.toLocalDate(this.todayIso).getTime();
 
     return Math.floor((todayTime - dayTime) / 86_400_000);
+  }
+
+  private getDefaultEditOccurrenceDate(task: DashboardTask): string | null {
+    const sortedOccurrences = [...task.occurrences]
+      .sort((a, b) => a.occurrenceDate.localeCompare(b.occurrenceDate));
+
+    return sortedOccurrences.find(occurrence => occurrence.occurrenceDate >= this.todayIso)?.occurrenceDate
+      ?? sortedOccurrences[0]?.occurrenceDate
+      ?? null;
   }
 
   private toIsoDate(date: Date): string {
