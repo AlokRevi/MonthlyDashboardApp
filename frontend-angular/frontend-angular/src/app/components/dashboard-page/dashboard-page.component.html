@@ -44,9 +44,16 @@
     [weekdayOptions]="weekdayOptions"
     [weekOfMonthOptions]="weekOfMonthOptions"
     (createTask)="state.createTask($event)"
-    (createCategory)="state.createCategory($event)"
+    (openCategoryDialog)="state.openCategoryCreateDialog()"
     (validationError)="state.showError($event)">
   </app-task-create-form>
+
+  <app-category-create-dialog
+    [open]="state.categoryCreateDialogOpen()"
+    [saving]="state.categorySaving()"
+    (close)="state.closeCategoryCreateDialog()"
+    (createCategory)="state.createCategory($event)">
+  </app-category-create-dialog>
 
   @if (state.loading()) {
   <p class="loading">Loading dashboard...</p>

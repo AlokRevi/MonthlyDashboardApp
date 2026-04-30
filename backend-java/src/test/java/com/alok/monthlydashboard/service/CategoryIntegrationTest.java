@@ -49,7 +49,7 @@ class CategoryIntegrationTest {
                   "name": "Health",
                   "color": "#16a34a",
                   "requires": "MOVEMENT",
-                  "feelsLike": ["ROUTINE", "ENERGY_BOOST"]
+                  "feelsLike": ["ACTIVATING", "FUN", "MILD_FUTURE_STRESS", "MEDIUM"]
                 }
                 """;
 
@@ -60,7 +60,12 @@ class CategoryIntegrationTest {
                 .andExpect(jsonPath("$.name").value("Health"))
                 .andExpect(jsonPath("$.color").value("#16a34a"))
                 .andExpect(jsonPath("$.requires").value("MOVEMENT"))
-                .andExpect(jsonPath("$.feelsLike", contains("ROUTINE", "ENERGY_BOOST")))
+                .andExpect(jsonPath("$.feelsLike", contains(
+                        "ACTIVATING",
+                        "FUN",
+                        "MILD_FUTURE_STRESS",
+                        "MEDIUM"
+                )))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -71,7 +76,12 @@ class CategoryIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Health"))
                 .andExpect(jsonPath("$.requires").value("MOVEMENT"))
-                .andExpect(jsonPath("$.feelsLike", contains("ROUTINE", "ENERGY_BOOST")));
+                .andExpect(jsonPath("$.feelsLike", contains(
+                        "ACTIVATING",
+                        "FUN",
+                        "MILD_FUTURE_STRESS",
+                        "MEDIUM"
+                )));
     }
 
     @Test
@@ -81,7 +91,7 @@ class CategoryIntegrationTest {
                   "name": "Learning",
                   "color": "#0891b2",
                   "requires": "FOCUS",
-                  "feelsLike": ["DEEP_WORK"]
+                  "feelsLike": ["TIRING", "OKAY", "NO_PRESSURE", "EASY"]
                 }
                 """;
 
@@ -100,7 +110,7 @@ class CategoryIntegrationTest {
                   "name": "Outdoor",
                   "color": "#65a30d",
                   "requires": "OUTDOOR",
-                  "feelsLike": ["RESET", "QUICK_WIN"]
+                  "feelsLike": ["ENERGIZING", "BLISSFUL", "URGENT_AND_IMPORTANT", "HARD"]
                 }
                 """;
 
@@ -111,7 +121,12 @@ class CategoryIntegrationTest {
                 .andExpect(jsonPath("$.name").value("Outdoor"))
                 .andExpect(jsonPath("$.color").value("#65a30d"))
                 .andExpect(jsonPath("$.requires").value("OUTDOOR"))
-                .andExpect(jsonPath("$.feelsLike", contains("RESET", "QUICK_WIN")));
+                .andExpect(jsonPath("$.feelsLike", contains(
+                        "ENERGIZING",
+                        "BLISSFUL",
+                        "URGENT_AND_IMPORTANT",
+                        "HARD"
+                )));
     }
 
     @Test

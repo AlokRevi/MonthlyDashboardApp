@@ -27,6 +27,7 @@ export class DashboardPageStateService {
   successMessage = signal('');
   taskSaving = signal(false);
   categorySaving = signal(false);
+  categoryCreateDialogOpen = signal(false);
 
   editModalOpen = signal(false);
   editTaskId = signal<number | null>(null);
@@ -138,6 +139,7 @@ export class DashboardPageStateService {
     this.dashboardApi.createCategory(request).subscribe({
       next: () => {
         this.categorySaving.set(false);
+        this.closeCategoryCreateDialog();
         this.showSuccess('Category created.');
         this.loadDashboard();
       },
@@ -147,6 +149,14 @@ export class DashboardPageStateService {
         this.showError('Could not create category.');
       }
     });
+  }
+
+  openCategoryCreateDialog(): void {
+    this.categoryCreateDialogOpen.set(true);
+  }
+
+  closeCategoryCreateDialog(): void {
+    this.categoryCreateDialogOpen.set(false);
   }
 
   deleteCategory(categoryId: number): void {

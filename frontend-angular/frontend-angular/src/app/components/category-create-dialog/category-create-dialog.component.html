@@ -1,0 +1,119 @@
+@if (open) {
+<div class="dialog-backdrop" (click)="onClose()">
+  <section
+    class="category-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="category-dialog-title"
+    (click)="$event.stopPropagation()">
+    <header class="dialog-header">
+      <div>
+        <h2 id="category-dialog-title">Create Category</h2>
+        <p>Set the default profile for tasks in this category.</p>
+      </div>
+
+      <button
+        type="button"
+        class="icon-button"
+        aria-label="Close category dialog"
+        [disabled]="saving"
+        (click)="onClose()">
+        ×
+      </button>
+    </header>
+
+    <div class="dialog-grid">
+      <label>
+        Category name
+        <input type="text" [(ngModel)]="name" placeholder="Bills" />
+        @if (fieldErrors['name']) {
+        <span class="field-error">{{ fieldErrors['name'] }}</span>
+        }
+      </label>
+
+      <label>
+        Category colour
+        <div class="color-picker-row">
+          <input class="color-picker" type="color" [(ngModel)]="color" />
+          <span class="color-preview" [style.background]="color"></span>
+          <span class="color-code">{{ color }}</span>
+        </div>
+      </label>
+
+      <label>
+        Requires
+        <select [(ngModel)]="requires">
+          @for (option of requiresOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+        @if (fieldErrors['requires']) {
+        <span class="field-error">{{ fieldErrors['requires'] }}</span>
+        }
+      </label>
+
+      <label>
+        Energy
+        <select [(ngModel)]="energy">
+          <option value="">Choose energy</option>
+          @for (option of energyOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+        @if (fieldErrors['energy']) {
+        <span class="field-error">{{ fieldErrors['energy'] }}</span>
+        }
+      </label>
+
+      <label>
+        Enjoyment
+        <select [(ngModel)]="enjoyment">
+          <option value="">Choose enjoyment</option>
+          @for (option of enjoymentOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+        @if (fieldErrors['enjoyment']) {
+        <span class="field-error">{{ fieldErrors['enjoyment'] }}</span>
+        }
+      </label>
+
+      <label>
+        Pressure
+        <select [(ngModel)]="pressure">
+          <option value="">Choose pressure</option>
+          @for (option of pressureOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+        @if (fieldErrors['pressure']) {
+        <span class="field-error">{{ fieldErrors['pressure'] }}</span>
+        }
+      </label>
+
+      <label>
+        Effort
+        <select [(ngModel)]="effort">
+          <option value="">Choose effort</option>
+          @for (option of effortOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+        @if (fieldErrors['effort']) {
+        <span class="field-error">{{ fieldErrors['effort'] }}</span>
+        }
+      </label>
+    </div>
+
+    <footer class="dialog-actions">
+      <button type="button" class="secondary-button" [disabled]="saving" (click)="onClose()">
+        Cancel
+      </button>
+
+      <button type="button" class="primary-button" [disabled]="saving" (click)="onCreate()">
+        {{ saving ? 'Saving...' : 'Create Category' }}
+      </button>
+    </footer>
+  </section>
+</div>
+}

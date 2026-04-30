@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 
 import {
   CategoryResponse,
-  CreateCategoryRequest,
   CreateTaskRequest,
   IntervalUnit,
   RecurrenceType,
@@ -30,13 +29,10 @@ export class TaskCreateFormComponent {
   @Input() weekOfMonthOptions: { value: WeekOfMonth; label: string }[] = [];
 
   @Output() createTask = new EventEmitter<CreateTaskRequest>();
-  @Output() createCategory = new EventEmitter<CreateCategoryRequest>();
+  @Output() openCategoryDialog = new EventEmitter<void>();
   @Output() validationError = new EventEmitter<string>();
 
   fieldErrors: Record<string, string> = {};
-
-  newCategoryName = '';
-  newCategoryColor = '#2563eb';
 
   newTaskCategoryId: number | null = null;
   newTaskName = '';
@@ -53,25 +49,6 @@ export class TaskCreateFormComponent {
 
   constructor(private dateFormat: DateFormatService) {
     this.newTaskStartDate = this.dateFormat.toIsoDate();
-  }
-
-  onCreateCategory(): void {
-    this.fieldErrors = {};
-    const name = this.newCategoryName.trim();
-
-    if (!name) {
-      this.fieldErrors['categoryName'] = 'Category name is required.';
-      this.validationError.emit('Please fix the highlighted fields.');
-      return;
-    }
-
-    this.createCategory.emit({
-      name,
-      color: this.newCategoryColor || '#2563eb'
-    });
-
-    this.newCategoryName = '';
-    this.newCategoryColor = '#2563eb';
   }
 
   onCreateTask(): void {

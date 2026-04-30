@@ -1,5 +1,15 @@
 <section class="quick-form">
-  <h2>Quick Add</h2>
+  <div class="quick-form-header">
+    <h2>Quick Add</h2>
+
+    <button
+      type="button"
+      class="secondary-action-button"
+      [disabled]="categorySaving"
+      (click)="openCategoryDialog.emit()">
+      {{ categorySaving ? 'Saving category...' : 'Create Category' }}
+    </button>
+  </div>
 
   <div class="form-box">
     <h3>Add Task</h3>
@@ -133,34 +143,16 @@
     </button>
 
     @if (availableCategories.length === 0) {
-    <p class="form-helper">Create a category first before adding tasks.</p>
-    }
-  </div>
-
-  <div class="form-box">
-    <h3>Add Category</h3>
-
-    <div class="form-row">
-      <label>
-        Category Name
-        <input type="text" [(ngModel)]="newCategoryName" placeholder="Bills" />
-        @if (fieldErrors['categoryName']) {
-        <span class="field-error">{{ fieldErrors['categoryName'] }}</span>
-        }
-      </label>
-
-      <label>
-        Category Colour
-        <div class="color-picker-row">
-          <input class="color-picker" type="color" [(ngModel)]="newCategoryColor" />
-          <span class="color-preview" [style.background]="newCategoryColor"></span>
-          <span class="color-code">{{ newCategoryColor }}</span>
-        </div>
-      </label>
-
-      <button type="button" [disabled]="categorySaving" (click)="onCreateCategory()">
-        {{ categorySaving ? 'Saving...' : 'Add Category' }}
+    <div class="empty-category-row">
+      <p class="form-helper">Create a category first before adding tasks.</p>
+      <button
+        type="button"
+        class="secondary-action-button"
+        [disabled]="categorySaving"
+        (click)="openCategoryDialog.emit()">
+        Create Category
       </button>
     </div>
+    }
   </div>
 </section>

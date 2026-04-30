@@ -13,6 +13,7 @@ import { TaskCreateFormComponent } from '../task-create-form/task-create-form.co
 import { TaskEditModalComponent } from '../task-edit-modal/task-edit-modal.component';
 import { CategoryManagerComponent } from '../category-manager/category-manager.component';
 import { MonthNavigationComponent } from '../month-navigation/month-navigation.component';
+import { CategoryCreateDialogComponent } from '../category-create-dialog/category-create-dialog.component';
 import {
   INTERVAL_UNIT_OPTIONS,
   MONTH_OPTIONS,
@@ -33,6 +34,7 @@ import { DashboardPageStateService } from './dashboard-page-state.service';
     TaskCreateFormComponent,
     TaskEditModalComponent,
     CategoryManagerComponent,
+    CategoryCreateDialogComponent,
     MonthNavigationComponent
   ],
   templateUrl: './dashboard-page.component.html',

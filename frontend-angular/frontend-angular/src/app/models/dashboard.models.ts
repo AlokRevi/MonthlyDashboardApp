@@ -114,7 +114,23 @@ export type FeelsLikeLabel =
   | 'DEEP_WORK'
   | 'ROUTINE'
   | 'ENERGY_BOOST'
-  | 'RESET';
+  | 'RESET'
+  | 'DEATHLY_DRAINING'
+  | 'TIRING'
+  | 'ACTIVATING'
+  | 'ENERGIZING'
+  | 'BORING'
+  | 'OKAY'
+  | 'FUN'
+  | 'BLISSFUL'
+  | 'NO_PRESSURE'
+  | 'MILD_FUTURE_STRESS'
+  | 'URGENT_AND_IMPORTANT'
+  | 'AMORPHOUS_DREAD'
+  | 'EASY'
+  | 'MEDIUM'
+  | 'HARD'
+  | 'VERY_HARD';
 
 // -------------------------------
 // Task models
