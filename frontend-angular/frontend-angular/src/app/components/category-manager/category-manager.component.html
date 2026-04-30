@@ -39,11 +39,11 @@
     }
 
     <div class="completed-category-popover">
-      @if (getCategoryTaskItems(category.id).length === 0) {
+      @if (categoryTaskItemsById[category.id].length === 0) {
       <p class="completed-empty">No active tasks this month.</p>
       }
 
-      @for (item of getCategoryTaskItems(category.id); track item.taskName + item.occurrenceDate) {
+      @for (item of categoryTaskItemsById[category.id]; track item.taskName + item.occurrenceDate) {
       <div class="completed-task-item">
         <strong>{{ item.taskName }}</strong>
         <span>{{ dateFormat.toWeekdayLongMonthOrdinal(item.occurrenceDate) }}</span>

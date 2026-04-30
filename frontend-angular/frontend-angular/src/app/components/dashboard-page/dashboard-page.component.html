@@ -6,12 +6,12 @@
       <div class="title-row">
         <h1>Monthly Dashboard</h1>
 
-        @if (overdueCount > 0) {
-        <span class="overdue-badge">{{ overdueCount }} overdue</span>
+        @if (state.overdueCount() > 0) {
+        <span class="overdue-badge">{{ state.overdueCount() }} overdue</span>
         }
 
-        @if (dueTodayCount > 0) {
-        <span class="today-badge">{{ dueTodayCount }} due today</span>
+        @if (state.dueTodayCount() > 0) {
+        <span class="today-badge">{{ state.dueTodayCount() }} due today</span>
         }
       </div>
 
@@ -22,47 +22,47 @@
     </div>
 
     <app-month-navigation
-      [selectedYear]="selectedYear"
-      [selectedMonth]="selectedMonth"
-      [loading]="loading"
+      [selectedYear]="state.selectedYear()"
+      [selectedMonth]="state.selectedMonth()"
+      [loading]="state.loading()"
       [monthOptions]="monthOptions"
-      (selectedYearChange)="selectedYear = $event"
-      (selectedMonthChange)="selectedMonth = $event"
-      (loadMonth)="onMonthChanged()"
-      (previousMonth)="goToPreviousMonth()"
-      (currentMonth)="goToCurrentMonth()"
-      (nextMonth)="goToNextMonth()">
+      (selectedYearChange)="state.setSelectedYear($event)"
+      (selectedMonthChange)="state.setSelectedMonth($event)"
+      (loadMonth)="state.loadDashboard()"
+      (previousMonth)="state.goToPreviousMonth()"
+      (currentMonth)="state.goToCurrentMonth()"
+      (nextMonth)="state.goToNextMonth()">
     </app-month-navigation>
   </header>
 
   <app-task-create-form
-    [availableCategories]="availableCategories"
-    [taskSaving]="taskSaving"
-    [categorySaving]="categorySaving"
+    [availableCategories]="state.availableCategories()"
+    [taskSaving]="state.taskSaving()"
+    [categorySaving]="state.categorySaving()"
     [recurrenceOptions]="recurrenceOptions"
     [intervalUnitOptions]="intervalUnitOptions"
     [weekdayOptions]="weekdayOptions"
     [weekOfMonthOptions]="weekOfMonthOptions"
-    (createTask)="onCreateTask($event)"
-    (createCategory)="onCreateCategory($event)"
-    (validationError)="showError($event)">
+    (createTask)="state.createTask($event)"
+    (createCategory)="state.createCategory($event)"
+    (validationError)="state.showError($event)">
   </app-task-create-form>
 
-  @if (loading) {
+  @if (state.loading()) {
   <p class="loading">Loading dashboard...</p>
   }
 
-  @if (errorMessage) {
-  <p class="error">{{ errorMessage }}</p>
+  @if (state.errorMessage()) {
+  <p class="error">{{ state.errorMessage() }}</p>
   }
 
-  @if (successMessage) {
-  <p class="success">{{ successMessage }}</p>
+  @if (state.successMessage()) {
+  <p class="success">{{ state.successMessage() }}</p>
   }
 
   <main class="dashboard-layout">
     <section class="main-panel">
-      @if (dashboard) {
+      @if (state.dashboard(); as dashboard) {
       <div class="card">
         <div class="section-header">
           <h2>{{ dashboard.monthLabel }}</h2>
@@ -81,7 +81,7 @@
           <span><i class="dot due-today"></i> Due today</span>
         </div>
 
-        @if (visibleDashboardCategories.length === 0) {
+        @if (state.visibleDashboardCategories().length === 0) {
         <div class="empty-dashboard-state">
           <strong>No active task occurrences yet.</strong>
           <p>Add a task above to start building your monthly view.</p>
@@ -90,12 +90,12 @@
         <p class="helper-note">Showing only categories that currently have tasks.</p>
 
         <app-category-section
-          [categories]="visibleDashboardCategories"
+          [categories]="state.visibleDashboardCategories()"
           [dayStrip]="dashboard.dayStrip"
-          (markComplete)="onMarkComplete($event)"
-          (undoComplete)="onUndoComplete($event)"
-          (deleteTask)="onDeleteTask($event)"
-          (editTask)="openEditTaskModal($event)">
+          (markComplete)="state.markComplete($event)"
+          (undoComplete)="state.undoComplete($event)"
+          (deleteTask)="state.deleteTask($event)"
+          (editTask)="state.openEditTaskModal($event)">
         </app-category-section>
         }
       </div>
@@ -103,32 +103,32 @@
     </section>
 
     <aside class="side-panel">
-      @if (checklist) {
+      @if (state.checklist(); as checklist) {
       <app-today-checklist
         [checklist]="checklist"
-        (markComplete)="onMarkComplete($event)">
+        (markComplete)="state.markComplete($event)">
       </app-today-checklist>
       }
 
       <app-category-manager
-        [categories]="availableCategories"
-        [dashboard]="dashboard"
-        (deleteCategory)="onDeleteCategory($event)">
+        [categories]="state.availableCategories()"
+        [dashboard]="state.dashboard()"
+        (deleteCategory)="state.deleteCategory($event)">
       </app-category-manager>
     </aside>
   </main>
 
   <app-task-edit-modal
-    [open]="editModalOpen"
-    [loading]="editLoading"
-    [saving]="editSaving"
-    [task]="editTask"
-    [availableCategories]="availableCategories"
+    [open]="state.editModalOpen()"
+    [loading]="state.editLoading()"
+    [saving]="state.editSaving()"
+    [task]="state.editTask()"
+    [availableCategories]="state.availableCategories()"
     [recurrenceOptions]="recurrenceOptions"
     [intervalUnitOptions]="intervalUnitOptions"
     [weekdayOptions]="weekdayOptions"
     [weekOfMonthOptions]="weekOfMonthOptions"
-    (close)="closeEditTaskModal()"
-    (save)="onUpdateTask($event)">
+    (close)="state.closeEditTaskModal()"
+    (save)="state.updateTask($event)">
   </app-task-edit-modal>
 </div>
