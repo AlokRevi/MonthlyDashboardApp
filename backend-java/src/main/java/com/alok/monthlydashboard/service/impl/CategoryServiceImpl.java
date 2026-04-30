@@ -29,6 +29,8 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = new Category();
         category.setName(request.name());
         category.setColor(request.color());
+        category.setRequires(request.requires());
+        category.setFeelsLike(request.feelsLike());
 
         Category saved = categoryRepository.save(category);
         return CategoryMapper.toResponse(saved);
@@ -55,6 +57,8 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = getCategoryOrThrow(categoryId);
         category.setName(request.name());
         category.setColor(request.color());
+        category.setRequires(request.requires());
+        category.setFeelsLike(request.feelsLike());
 
         Category saved = categoryRepository.save(category);
         return CategoryMapper.toResponse(saved);

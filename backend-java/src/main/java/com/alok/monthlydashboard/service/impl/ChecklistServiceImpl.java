@@ -68,6 +68,9 @@ public class ChecklistServiceImpl implements ChecklistService {
                                 task.getName(),
                                 task.getCategory().getId(),
                                 task.getCategory().getName(),
+                                task.getCategory().getColor(),
+                                task.getCategory().getRequires(),
+                                List.copyOf(task.getCategory().getFeelsLike()),
                                 occurrenceDate,
                                 OccurrenceStatus.COMPLETED
                         ));
@@ -84,6 +87,9 @@ public class ChecklistServiceImpl implements ChecklistService {
                         task.getName(),
                         task.getCategory().getId(),
                         task.getCategory().getName(),
+                        task.getCategory().getColor(),
+                        task.getCategory().getRequires(),
+                        List.copyOf(task.getCategory().getFeelsLike()),
                         occurrenceDate,
                         status
                 ));

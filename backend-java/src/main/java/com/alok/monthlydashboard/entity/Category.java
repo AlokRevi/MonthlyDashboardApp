@@ -1,5 +1,7 @@
 package com.alok.monthlydashboard.entity;
 
+import com.alok.monthlydashboard.common.enums.CategoryRequires;
+import com.alok.monthlydashboard.common.enums.FeelsLikeLabel;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -18,6 +20,19 @@ public class Category extends BaseEntity {
 
     @Column(length = 20)
     private String color;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "requires", nullable = false, length = 20, columnDefinition = "TEXT DEFAULT 'FOCUS'")
+    private CategoryRequires requires = CategoryRequires.FOCUS;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "category_feels_like_labels",
+            joinColumns = @JoinColumn(name = "category_id")
+    )
+    @Enumerated(EnumType.STRING)
+    @Column(name = "label", nullable = false, length = 30)
+    private List<FeelsLikeLabel> feelsLike = new ArrayList<>();
 
     @OneToMany(mappedBy = "category")
     private List<Task> tasks = new ArrayList<>();
@@ -40,6 +55,25 @@ public class Category extends BaseEntity {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public CategoryRequires getRequires() {
+        return requires;
+    }
+
+    public void setRequires(CategoryRequires requires) {
+        this.requires = requires == null ? CategoryRequires.FOCUS : requires;
+    }
+
+    public List<FeelsLikeLabel> getFeelsLike() {
+        return feelsLike;
+    }
+
+    public void setFeelsLike(List<FeelsLikeLabel> feelsLike) {
+        this.feelsLike.clear();
+        if (feelsLike != null) {
+            this.feelsLike.addAll(feelsLike);
+        }
     }
 
     public List<Task> getTasks() {

@@ -63,6 +63,9 @@ export interface ChecklistItem {
   taskName: string;
   categoryId: number;
   categoryName: string;
+  categoryColor: string;
+  categoryRequires: CategoryRequires;
+  categoryFeelsLike: FeelsLikeLabel[];
   occurrenceDate: string;
   status: 'DUE_TODAY' | 'OVERDUE' | 'COMPLETED';
 }
@@ -83,16 +86,35 @@ export interface CompleteTaskRequest {
 export interface CreateCategoryRequest {
   name: string;
   color: string;
+  requires?: CategoryRequires;
+  feelsLike?: FeelsLikeLabel[];
 }
 
 export interface CategoryResponse {
   id: number;
   name: string;
   color: string;
+  requires: CategoryRequires;
+  feelsLike: FeelsLikeLabel[];
   taskCount: number;
   createdAt: string;
   updatedAt?: string;
 }
+
+export interface UpdateCategoryRequest {
+  name: string;
+  color: string;
+  requires?: CategoryRequires;
+  feelsLike?: FeelsLikeLabel[];
+}
+
+export type CategoryRequires = 'FOCUS' | 'MOVEMENT' | 'OUTDOOR';
+export type FeelsLikeLabel =
+  | 'QUICK_WIN'
+  | 'DEEP_WORK'
+  | 'ROUTINE'
+  | 'ENERGY_BOOST'
+  | 'RESET';
 
 // -------------------------------
 // Task models

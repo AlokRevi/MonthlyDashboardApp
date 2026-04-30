@@ -71,6 +71,8 @@ public class ExportServiceImpl implements ExportService {
                 category.getId(),
                 category.getName(),
                 category.getColor(),
+                category.getRequires(),
+                List.copyOf(category.getFeelsLike()),
                 category.getCreatedAt(),
                 category.getUpdatedAt()
         );
