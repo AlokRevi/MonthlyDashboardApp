@@ -134,6 +134,89 @@ class RecurrenceServiceCriticalTest {
     }
 
     @Test
+    void monthlyIntervalFallsBackToLastValidDayInShortMonthsWithoutLosingAnchorDay() {
+        Task task = intervalTask(
+                113L,
+                LocalDate.of(2026, 1, 31),
+                1,
+                com.alok.monthlydashboard.entity.enums.IntervalUnit.MONTHS
+        );
+        when(taskRepository.findById(113L)).thenReturn(Optional.of(task));
+
+        assertThat(recurrenceService.generateOccurrenceDatesForMonth(113L, 2026, 2))
+                .containsExactly(LocalDate.of(2026, 2, 28));
+        assertThat(recurrenceService.generateOccurrenceDatesForMonth(113L, 2026, 3))
+                .containsExactly(LocalDate.of(2026, 3, 31));
+        assertThat(recurrenceService.generateOccurrenceDatesForMonth(113L, 2026, 4))
+                .containsExactly(LocalDate.of(2026, 4, 30));
+    }
+
+    @Test
+    void monthlyIntervalUsesLeapDayFallbackWhenFebruaryHasTwentyNineDays() {
+        Task task = intervalTask(
+                114L,
+                LocalDate.of(2024, 1, 31),
+                1,
+                com.alok.monthlydashboard.entity.enums.IntervalUnit.MONTHS
+        );
+        when(taskRepository.findById(114L)).thenReturn(Optional.of(task));
+
+        assertThat(recurrenceService.generateOccurrenceDatesForMonth(114L, 2024, 2))
+                .containsExactly(LocalDate.of(2024, 2, 29));
+    }
+
+    @Test
+    void monthlyIntervalKeepsCadenceAcrossYearBoundary() {
+        Task task = intervalTask(
+                115L,
+                LocalDate.of(2025, 11, 30),
+                1,
+                com.alok.monthlydashboard.entity.enums.IntervalUnit.MONTHS
+        );
+        when(taskRepository.findById(115L)).thenReturn(Optional.of(task));
+
+        assertThat(recurrenceService.generateOccurrenceDatesForMonth(115L, 2025, 12))
+                .containsExactly(LocalDate.of(2025, 12, 30));
+        assertThat(recurrenceService.generateOccurrenceDatesForMonth(115L, 2026, 1))
+                .containsExactly(LocalDate.of(2026, 1, 30));
+    }
+
+    @Test
+    void monthlyIntervalRespectsIntervalValueAcrossMonths() {
+        Task task = intervalTask(
+                116L,
+                LocalDate.of(2026, 1, 31),
+                2,
+                com.alok.monthlydashboard.entity.enums.IntervalUnit.MONTHS
+        );
+        when(taskRepository.findById(116L)).thenReturn(Optional.of(task));
+
+        assertThat(recurrenceService.generateOccurrenceDatesForMonth(116L, 2026, 2))
+                .isEmpty();
+        assertThat(recurrenceService.generateOccurrenceDatesForMonth(116L, 2026, 3))
+                .containsExactly(LocalDate.of(2026, 3, 31));
+        assertThat(recurrenceService.generateOccurrenceDatesForMonth(116L, 2026, 5))
+                .containsExactly(LocalDate.of(2026, 5, 31));
+    }
+
+    @Test
+    void monthlyIntervalRespectsEndDateCutoff() {
+        Task task = intervalTask(
+                117L,
+                LocalDate.of(2026, 1, 31),
+                1,
+                com.alok.monthlydashboard.entity.enums.IntervalUnit.MONTHS
+        );
+        task.setEndDate(LocalDate.of(2026, 3, 15));
+        when(taskRepository.findById(117L)).thenReturn(Optional.of(task));
+
+        assertThat(recurrenceService.generateOccurrenceDatesForMonth(117L, 2026, 2))
+                .containsExactly(LocalDate.of(2026, 2, 28));
+        assertThat(recurrenceService.generateOccurrenceDatesForMonth(117L, 2026, 3))
+                .isEmpty();
+    }
+
+    @Test
     void weekdayRulesSelectRequestedOrdinalWeekday() {
         Task firstMonday = weekdayTask(
                 108L,
@@ -232,11 +315,25 @@ class RecurrenceServiceCriticalTest {
     }
 
     private Task intervalTask(Long id, LocalDate startDate, int intervalDays) {
+        return intervalTask(
+                id,
+                startDate,
+                intervalDays,
+                com.alok.monthlydashboard.entity.enums.IntervalUnit.DAYS
+        );
+    }
+
+    private Task intervalTask(
+            Long id,
+            LocalDate startDate,
+            int intervalValue,
+            com.alok.monthlydashboard.entity.enums.IntervalUnit intervalUnit
+    ) {
         Task task = baseTask(id, RecurrenceType.INTERVAL, startDate);
 
         TaskRecurrenceRule rule = new TaskRecurrenceRule();
-        rule.setIntervalValue(intervalDays);
-        rule.setIntervalUnit(com.alok.monthlydashboard.entity.enums.IntervalUnit.DAYS);
+        rule.setIntervalValue(intervalValue);
+        rule.setIntervalUnit(intervalUnit);
         task.setRecurrenceRule(rule);
 
         return task;

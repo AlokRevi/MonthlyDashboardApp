@@ -44,6 +44,20 @@ class RecurrenceSummaryHelperTest {
     }
 
     @Test
+    void summarizesMonthlyIntervalRule() {
+        Task task = intervalTask(3, IntervalUnit.MONTHS);
+
+        assertThat(RecurrenceSummaryHelper.summarize(task)).isEqualTo("every 3 months");
+    }
+
+    @Test
+    void summarizesSingularMonthlyIntervalRule() {
+        Task task = intervalTask(1, IntervalUnit.MONTHS);
+
+        assertThat(RecurrenceSummaryHelper.summarize(task)).isEqualTo("every month");
+    }
+
+    @Test
     void summarizesWeekdayRule() {
         Task task = weekdayTask(Weekday.SATURDAY, WeekOfMonth.SECOND);
 

@@ -3,5 +3,6 @@ package com.alok.monthlydashboard.common.enums;
 
 public enum IntervalUnit {
     DAYS,
-    WEEKS
+    WEEKS,
+    MONTHS
 }

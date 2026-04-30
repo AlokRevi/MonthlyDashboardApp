@@ -138,7 +138,7 @@ export type FeelsLikeLabel =
 // -------------------------------
 
 export type RecurrenceType = 'FIXED_DATE' | 'INTERVAL' | 'WEEKDAY';
-export type IntervalUnit = 'DAYS' | 'WEEKS';
+export type IntervalUnit = 'DAYS' | 'WEEKS' | 'MONTHS';
 
 // API spec uses FIRST/SECOND/THIRD/FOURTH/LAST.
 export type WeekOfMonth = 'FIRST' | 'SECOND' | 'THIRD' | 'FOURTH' | 'LAST';

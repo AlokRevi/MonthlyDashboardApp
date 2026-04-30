@@ -68,6 +68,7 @@ public final class RecurrenceSummaryHelper {
         return switch (unit) {
             case DAYS -> value == 1 ? "day" : "days";
             case WEEKS -> value == 1 ? "week" : "weeks";
+            case MONTHS -> value == 1 ? "month" : "months";
         };
     }
 

@@ -21,13 +21,14 @@ export const MONTH_OPTIONS = [
 
 export const RECURRENCE_OPTIONS: { value: RecurrenceType; label: string }[] = [
   { value: 'FIXED_DATE', label: 'Fixed Date' },
-  { value: 'INTERVAL', label: 'Every X Days/Weeks' },
+  { value: 'INTERVAL', label: 'Every X Days/Weeks/Months' },
   { value: 'WEEKDAY', label: 'Weekday Pattern' }
 ];
 
 export const INTERVAL_UNIT_OPTIONS: { value: IntervalUnit; label: string }[] = [
   { value: 'DAYS', label: 'Days' },
-  { value: 'WEEKS', label: 'Weeks' }
+  { value: 'WEEKS', label: 'Weeks' },
+  { value: 'MONTHS', label: 'Months' }
 ];
 
 export const WEEKDAY_OPTIONS = [

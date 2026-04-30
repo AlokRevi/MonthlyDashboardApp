@@ -19,6 +19,7 @@ import com.alok.monthlydashboard.common.enums.*;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -180,6 +181,10 @@ public class RecurrenceServiceImpl implements RecurrenceService {
             return dates;
         }
 
+        if (rule.getIntervalUnit() == IntervalUnit.MONTHS) {
+            return generateMonthlyIntervalOccurrences(task, targetMonth, rule.getIntervalValue());
+        }
+
         LocalDate cursor = task.getStartDate();
 
         while (cursor.isBefore(monthStart)) {
@@ -195,6 +200,33 @@ public class RecurrenceServiceImpl implements RecurrenceService {
         }
 
         return dates;
+    }
+
+    private List<LocalDate> generateMonthlyIntervalOccurrences(Task task, YearMonth targetMonth, int intervalValue) {
+        List<LocalDate> dates = new ArrayList<>();
+
+        YearMonth startMonth = YearMonth.from(task.getStartDate());
+        long monthsFromStart = ChronoUnit.MONTHS.between(startMonth, targetMonth);
+
+        if (monthsFromStart < 0 || monthsFromStart % intervalValue != 0) {
+            return dates;
+        }
+
+        LocalDate occurrenceDate = anchoredMonthlyDate(targetMonth, task.getStartDate().getDayOfMonth());
+
+        if (occurrenceDate.isBefore(task.getStartDate())) {
+            return dates;
+        }
+        if (task.getEndDate() != null && occurrenceDate.isAfter(task.getEndDate())) {
+            return dates;
+        }
+
+        dates.add(occurrenceDate);
+        return dates;
+    }
+
+    private LocalDate anchoredMonthlyDate(YearMonth targetMonth, int anchorDay) {
+        return targetMonth.atDay(Math.min(anchorDay, targetMonth.lengthOfMonth()));
     }
 
     private List<LocalDate> generateWeekdayOccurrences(Task task, YearMonth targetMonth) {
@@ -262,6 +294,7 @@ public class RecurrenceServiceImpl implements RecurrenceService {
         return switch (unit) {
             case DAYS -> date.plusDays(intervalValue);
             case WEEKS -> date.plusWeeks(intervalValue);
+            case MONTHS -> throw new IllegalArgumentException("Monthly intervals require start-date anchored generation");
         };
     }
 
