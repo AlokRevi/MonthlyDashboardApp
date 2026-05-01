@@ -42,7 +42,14 @@
         </div>
 
         @if (item.status === 'COMPLETED') {
-        <div class="completed-indicator" title="Completed today">✓</div>
+        <button
+          type="button"
+          class="completed-indicator completed-action-button"
+          title="Undo completion"
+          aria-label="Undo completion"
+          (click)="onUndoComplete(item)">
+          ✓
+        </button>
         } @else {
           <button
             type="button"

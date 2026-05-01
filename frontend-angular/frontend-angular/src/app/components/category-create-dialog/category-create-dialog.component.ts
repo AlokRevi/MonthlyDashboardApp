@@ -11,9 +11,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import {
+  CategoryResponse,
   CategoryRequires,
   CreateCategoryRequest,
-  FeelsLikeLabel
+  FeelsLikeLabel,
+  UpdateCategoryRequest
 } from '../../models/dashboard.models';
 
 interface SelectOption<T> {
@@ -32,9 +34,11 @@ interface SelectOption<T> {
 export class CategoryCreateDialogComponent implements OnChanges {
   @Input() open = false;
   @Input() saving = false;
+  @Input() category: CategoryResponse | null = null;
 
   @Output() close = new EventEmitter<void>();
   @Output() createCategory = new EventEmitter<CreateCategoryRequest>();
+  @Output() updateCategory = new EventEmitter<{ categoryId: number; request: UpdateCategoryRequest }>();
 
   fieldErrors: Record<string, string> = {};
 
@@ -84,6 +88,10 @@ export class CategoryCreateDialogComponent implements OnChanges {
     if (changes['open'] && !this.open) {
       this.reset();
     }
+
+    if ((changes['open'] || changes['category']) && this.open) {
+      this.populateForMode();
+    }
   }
 
   onClose(): void {
@@ -94,12 +102,12 @@ export class CategoryCreateDialogComponent implements OnChanges {
     this.close.emit();
   }
 
-  onCreate(): void {
+  onSave(): void {
     if (!this.validate()) {
       return;
     }
 
-    this.createCategory.emit({
+    const request = {
       name: this.name.trim(),
       color: this.color || '#2563eb',
       requires: this.requires,
@@ -109,7 +117,29 @@ export class CategoryCreateDialogComponent implements OnChanges {
         this.pressure,
         this.effort
       ] as FeelsLikeLabel[]
-    });
+    };
+
+    if (this.category) {
+      this.updateCategory.emit({
+        categoryId: this.category.id,
+        request
+      });
+      return;
+    }
+
+    this.createCategory.emit(request);
+  }
+
+  get dialogTitle(): string {
+    return this.category ? 'Edit Category' : 'Create Category';
+  }
+
+  get primaryActionLabel(): string {
+    if (this.saving) {
+      return 'Saving...';
+    }
+
+    return this.category ? 'Save Category' : 'Create Category';
   }
 
   reset(): void {
@@ -121,6 +151,26 @@ export class CategoryCreateDialogComponent implements OnChanges {
     this.enjoyment = '';
     this.pressure = '';
     this.effort = '';
+  }
+
+  private populateForMode(): void {
+    if (!this.category) {
+      this.reset();
+      return;
+    }
+
+    this.fieldErrors = {};
+    this.name = this.category.name;
+    this.color = this.category.color || '#2563eb';
+    this.requires = this.category.requires ?? 'FOCUS';
+    this.energy = this.findProfileValue(this.energyOptions);
+    this.enjoyment = this.findProfileValue(this.enjoymentOptions);
+    this.pressure = this.findProfileValue(this.pressureOptions);
+    this.effort = this.findProfileValue(this.effortOptions);
+  }
+
+  private findProfileValue(options: SelectOption<FeelsLikeLabel>[]): FeelsLikeLabel | '' {
+    return options.find(option => this.category?.feelsLike?.includes(option.value))?.value ?? '';
   }
 
   private validate(): boolean {

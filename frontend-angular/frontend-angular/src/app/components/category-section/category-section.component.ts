@@ -31,6 +31,7 @@ export class CategorySectionComponent {
   @Output() undoComplete = new EventEmitter<{ taskId: number; occurrenceDate: string }>();
   @Output() deleteTask = new EventEmitter<number>();
   @Output() editTask = new EventEmitter<{ taskId: number; occurrenceDate: string | null }>();
+  @Output() editCategory = new EventEmitter<number>();
 
   expandedTaskId: number | null = null;
   private readonly todayIso = this.toIsoDate(new Date());

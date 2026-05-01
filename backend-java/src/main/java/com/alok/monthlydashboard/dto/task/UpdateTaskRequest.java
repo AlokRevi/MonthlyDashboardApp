@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import com.alok.monthlydashboard.common.enums.RecurrenceType;
+import com.alok.monthlydashboard.common.enums.FeelsLikeLabel;
 import com.alok.monthlydashboard.common.enums.TaskEditScope;
 import java.time.LocalDate;
 
@@ -32,6 +33,14 @@ public record UpdateTaskRequest(
         TaskEditScope editScope,
 
         LocalDate selectedOccurrenceDate,
+
+        FeelsLikeLabel energyOverride,
+
+        FeelsLikeLabel enjoymentOverride,
+
+        FeelsLikeLabel pressureOverride,
+
+        FeelsLikeLabel effortOverride,
 
         @Valid
         @NotNull

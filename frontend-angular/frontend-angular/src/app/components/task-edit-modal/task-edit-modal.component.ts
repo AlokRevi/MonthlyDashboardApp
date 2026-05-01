@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 
 import {
   CategoryResponse,
+  FeelsLikeLabel,
   IntervalUnit,
   RecurrenceType,
   TaskEditScope,
@@ -12,6 +13,11 @@ import {
   WeekOfMonth
 } from '../../models/dashboard.models';
 import { DateFormatService } from '../../services/date-format.service';
+
+interface SelectOption<T> {
+  value: T;
+  label: string;
+}
 
 @Component({
   selector: 'app-task-edit-modal',
@@ -52,6 +58,38 @@ export class TaskEditModalComponent implements OnChanges {
   editWeekOfMonth: WeekOfMonth = 'LAST';
   editScope: TaskEditScope = 'THIS_AND_FOLLOWING';
   editSelectedOccurrenceDate = '';
+  editEnergyOverride: FeelsLikeLabel | '' = '';
+  editEnjoymentOverride: FeelsLikeLabel | '' = '';
+  editPressureOverride: FeelsLikeLabel | '' = '';
+  editEffortOverride: FeelsLikeLabel | '' = '';
+
+  readonly energyOptions: SelectOption<FeelsLikeLabel>[] = [
+    { value: 'DEATHLY_DRAINING', label: 'Deathly draining' },
+    { value: 'TIRING', label: 'Tiring' },
+    { value: 'ACTIVATING', label: 'Activating' },
+    { value: 'ENERGIZING', label: 'Energizing' }
+  ];
+
+  readonly enjoymentOptions: SelectOption<FeelsLikeLabel>[] = [
+    { value: 'BORING', label: 'Boring' },
+    { value: 'OKAY', label: 'Okay' },
+    { value: 'FUN', label: 'Fun' },
+    { value: 'BLISSFUL', label: 'Blissful' }
+  ];
+
+  readonly pressureOptions: SelectOption<FeelsLikeLabel>[] = [
+    { value: 'NO_PRESSURE', label: 'No pressure' },
+    { value: 'MILD_FUTURE_STRESS', label: 'Mild future stress' },
+    { value: 'URGENT_AND_IMPORTANT', label: 'Urgent and important' },
+    { value: 'AMORPHOUS_DREAD', label: 'Amorphous dread' }
+  ];
+
+  readonly effortOptions: SelectOption<FeelsLikeLabel>[] = [
+    { value: 'EASY', label: 'Easy' },
+    { value: 'MEDIUM', label: 'Medium' },
+    { value: 'HARD', label: 'Hard' },
+    { value: 'VERY_HARD', label: 'Very hard' }
+  ];
 
   constructor(private dateFormat: DateFormatService) {
     this.editTaskStartDate = this.dateFormat.toIsoDate();
@@ -91,6 +129,10 @@ export class TaskEditModalComponent implements OnChanges {
     this.editWeekOfMonth = task.rule?.weekOfMonth ?? 'LAST';
     this.editScope = 'THIS_AND_FOLLOWING';
     this.editSelectedOccurrenceDate = this.selectedOccurrenceDate ?? task.startDate;
+    this.editEnergyOverride = task.energyOverride ?? '';
+    this.editEnjoymentOverride = task.enjoymentOverride ?? '';
+    this.editPressureOverride = task.pressureOverride ?? '';
+    this.editEffortOverride = task.effortOverride ?? '';
   }
 
   private validateEditTaskForm(): boolean {
@@ -153,7 +195,11 @@ export class TaskEditModalComponent implements OnChanges {
       endDate: this.editTaskEndDate || null,
       isActive: true,
       editScope: this.editScope,
-      selectedOccurrenceDate: this.editSelectedOccurrenceDate
+      selectedOccurrenceDate: this.editSelectedOccurrenceDate,
+      energyOverride: this.editEnergyOverride || null,
+      enjoymentOverride: this.editEnjoymentOverride || null,
+      pressureOverride: this.editPressureOverride || null,
+      effortOverride: this.editEffortOverride || null
     };
 
     if (this.editTaskRecurrenceType === 'FIXED_DATE') {

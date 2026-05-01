@@ -33,6 +33,7 @@ export class CategoryManagerComponent implements OnChanges {
   @Input() dashboard: MonthlyDashboardResponse | null = null;
 
   @Output() deleteCategory = new EventEmitter<number>();
+  @Output() editCategory = new EventEmitter<number>();
 
   expandedCategoryId: number | null = null;
   categoryTaskItemsById: Record<number, CategoryTaskItem[]> = {};

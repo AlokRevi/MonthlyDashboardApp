@@ -147,6 +147,7 @@ public class TaskServiceImpl implements TaskService {
         task.setStartDate(request.startDate());
         task.setEndDate(request.endDate());
         task.setActive(nextActiveState);
+        applyTaskProfileOverrides(task, request);
 
         TaskRecurrenceRule rule = task.getRecurrenceRule();
         if (rule == null) {
@@ -322,6 +323,7 @@ public class TaskServiceImpl implements TaskService {
         task.setStartDate(startDate);
         task.setEndDate(request.endDate());
         task.setActive(nextActiveState);
+        applyTaskProfileOverrides(task, request);
 
         TaskRecurrenceRule rule = task.getRecurrenceRule();
         if (rule == null) {
@@ -349,5 +351,12 @@ public class TaskServiceImpl implements TaskService {
         rule.setWeekOfMonth(request.weekOfMonth() == null ? null
                 : com.alok.monthlydashboard.entity.enums.WeekOfMonth.valueOf(request.weekOfMonth().name()));
         rule.setFallbackToLastDay(request.fallbackToLastDay() == null || request.fallbackToLastDay());
+    }
+
+    private void applyTaskProfileOverrides(Task task, UpdateTaskRequest request) {
+        task.setEnergyOverride(request.energyOverride());
+        task.setEnjoymentOverride(request.enjoymentOverride());
+        task.setPressureOverride(request.pressureOverride());
+        task.setEffortOverride(request.effortOverride());
     }
 }

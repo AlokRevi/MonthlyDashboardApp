@@ -52,8 +52,10 @@
   <app-category-create-dialog
     [open]="state.categoryCreateDialogOpen()"
     [saving]="state.categorySaving()"
+    [category]="state.categoryBeingEdited()"
     (close)="state.closeCategoryCreateDialog()"
-    (createCategory)="state.createCategory($event)">
+    (createCategory)="state.createCategory($event)"
+    (updateCategory)="state.updateCategory($event)">
   </app-category-create-dialog>
 
   @if (state.loading()) {
@@ -103,7 +105,8 @@
           (markComplete)="state.markComplete($event)"
           (undoComplete)="state.undoComplete($event)"
           (deleteTask)="state.deleteTask($event)"
-          (editTask)="state.openEditTaskModal($event)">
+          (editTask)="state.openEditTaskModal($event)"
+          (editCategory)="state.openCategoryEditDialog($event)">
         </app-category-section>
         }
       </div>
@@ -114,14 +117,16 @@
       @if (state.checklist(); as checklist) {
       <app-today-checklist
         [checklist]="checklist"
-        (markComplete)="state.markComplete($event)">
+        (markComplete)="state.markComplete($event)"
+        (undoComplete)="state.undoComplete($event)">
       </app-today-checklist>
       }
 
       <app-category-manager
         [categories]="state.availableCategories()"
         [dashboard]="state.dashboard()"
-        (deleteCategory)="state.deleteCategory($event)">
+        (deleteCategory)="state.deleteCategory($event)"
+        (editCategory)="state.openCategoryEditDialog($event)">
       </app-category-manager>
     </aside>
   </main>

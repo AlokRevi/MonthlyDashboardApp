@@ -1,6 +1,7 @@
 package com.alok.monthlydashboard.dto.task;
 
 import java.time.LocalDate;
+import com.alok.monthlydashboard.common.enums.FeelsLikeLabel;
 import com.alok.monthlydashboard.common.enums.RecurrenceType;
 
 public record TaskDetailResponse(
@@ -13,6 +14,10 @@ public record TaskDetailResponse(
         LocalDate startDate,
         LocalDate endDate,
         boolean isActive,
+        FeelsLikeLabel energyOverride,
+        FeelsLikeLabel enjoymentOverride,
+        FeelsLikeLabel pressureOverride,
+        FeelsLikeLabel effortOverride,
         TaskRuleRequest rule
 ) {
 }

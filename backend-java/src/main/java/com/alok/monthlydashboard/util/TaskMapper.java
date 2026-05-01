@@ -37,6 +37,10 @@ public final class TaskMapper {
                 task.getStartDate(),
                 task.getEndDate(),
                 task.isActive(),
+                task.getEnergyOverride(),
+                task.getEnjoymentOverride(),
+                task.getPressureOverride(),
+                task.getEffortOverride(),
                 toTaskRuleRequest(task)
         );
     }

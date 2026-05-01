@@ -28,6 +28,34 @@
   letter-spacing: -0.01em;
 }
 
+.category-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.category-title-row .category-title {
+  margin-bottom: 0;
+}
+
+.icon-category-button {
+  width: 26px;
+  height: 26px;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.icon-category-button:hover {
+  background: #dbeafe;
+}
+
 .task-row {
   display: grid;
   grid-template-columns: 170px 1fr;

@@ -5,7 +5,18 @@
   <div
     class="category-block"
     [style.border-color]="category.categoryColor || '#dbe3ef'">
-    <h3 class="category-title">{{ category.categoryName }}</h3>
+    <div class="category-title-row">
+      <h3 class="category-title">{{ category.categoryName }}</h3>
+
+      <button
+        type="button"
+        class="icon-category-button"
+        title="Edit category"
+        aria-label="Edit category"
+        (click)="editCategory.emit(category.categoryId)">
+        ✎
+      </button>
+    </div>
 
     @for (task of category.tasks; track trackByTask($index, task)) {
     <div

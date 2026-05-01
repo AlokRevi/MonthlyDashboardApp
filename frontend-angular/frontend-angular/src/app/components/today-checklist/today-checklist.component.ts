@@ -29,6 +29,10 @@ export class TodayChecklistComponent {
     taskId: number;
     occurrenceDate: string;
   }>();
+  @Output() undoComplete = new EventEmitter<{
+    taskId: number;
+    occurrenceDate: string;
+  }>();
 
   private readonly groupOrder: CategoryRequires[] = ['FOCUS', 'MOVEMENT', 'OUTDOOR'];
   private readonly groupLabels: Record<CategoryRequires, string> = {
@@ -73,6 +77,17 @@ export class TodayChecklistComponent {
     }
 
     this.markComplete.emit({
+      taskId: item.taskId,
+      occurrenceDate: item.occurrenceDate
+    });
+  }
+
+  onUndoComplete(item: ChecklistItem): void {
+    if (item.status !== 'COMPLETED') {
+      return;
+    }
+
+    this.undoComplete.emit({
       taskId: item.taskId,
       occurrenceDate: item.occurrenceDate
     });

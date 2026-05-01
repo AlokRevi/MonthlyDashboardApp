@@ -8,6 +8,7 @@ import {
   MonthlyDashboardResponse,
   TaskResponse,
   TodayChecklistResponse,
+  UpdateCategoryRequest,
   UpdateTaskRequest
 } from '../../models/dashboard.models';
 import { DashboardApiService } from '../../services/dashboard-api.service';
@@ -29,6 +30,7 @@ export class DashboardPageStateService {
   taskCreateSuccessCount = signal(0);
   categorySaving = signal(false);
   categoryCreateDialogOpen = signal(false);
+  categoryBeingEdited = signal<CategoryResponse | null>(null);
 
   editModalOpen = signal(false);
   editTaskId = signal<number | null>(null);
@@ -154,12 +156,44 @@ export class DashboardPageStateService {
     });
   }
 
+  updateCategory(event: { categoryId: number; request: UpdateCategoryRequest }): void {
+    this.categorySaving.set(true);
+
+    this.dashboardApi.updateCategory(event.categoryId, event.request).subscribe({
+      next: () => {
+        this.categorySaving.set(false);
+        this.closeCategoryCreateDialog();
+        this.showSuccess('Category updated.');
+        this.loadDashboard();
+      },
+      error: (error) => {
+        console.error('Update category failed:', error);
+        this.categorySaving.set(false);
+        this.showError(this.buildApiErrorMessage('Could not update category', error));
+      }
+    });
+  }
+
   openCategoryCreateDialog(): void {
+    this.categoryBeingEdited.set(null);
+    this.categoryCreateDialogOpen.set(true);
+  }
+
+  openCategoryEditDialog(categoryId: number): void {
+    const category = this.availableCategories().find(item => item.id === categoryId);
+
+    if (!category) {
+      this.showError('Could not load category details.');
+      return;
+    }
+
+    this.categoryBeingEdited.set(category);
     this.categoryCreateDialogOpen.set(true);
   }
 
   closeCategoryCreateDialog(): void {
     this.categoryCreateDialogOpen.set(false);
+    this.categoryBeingEdited.set(null);
   }
 
   deleteCategory(categoryId: number): void {

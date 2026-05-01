@@ -10,6 +10,7 @@ import {
   CreateCategoryRequest,
   CategoryResponse,
   CreateTaskRequest,
+  UpdateCategoryRequest,
   UpdateTaskRequest,
   TaskResponse
 } from '../models/dashboard.models';
@@ -43,6 +44,13 @@ export class DashboardApiService {
   createCategory(request: CreateCategoryRequest): Observable<CategoryResponse> {
     return this.http.post<CategoryResponse>(
       `${this.apiBase}/categories`,
+      request
+    );
+  }
+
+  updateCategory(categoryId: number, request: UpdateCategoryRequest): Observable<CategoryResponse> {
+    return this.http.put<CategoryResponse>(
+      `${this.apiBase}/categories/${categoryId}`,
       request
     );
   }

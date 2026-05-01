@@ -1,6 +1,7 @@
 package com.alok.monthlydashboard.entity;
 
 import com.alok.monthlydashboard.common.enums.RecurrenceType;
+import com.alok.monthlydashboard.common.enums.FeelsLikeLabel;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -37,6 +38,22 @@ public class Task extends BaseEntity {
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "energy_override", length = 30)
+    private FeelsLikeLabel energyOverride;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "enjoyment_override", length = 30)
+    private FeelsLikeLabel enjoymentOverride;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "pressure_override", length = 30)
+    private FeelsLikeLabel pressureOverride;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "effort_override", length = 30)
+    private FeelsLikeLabel effortOverride;
 
     @OneToOne(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private TaskRecurrenceRule recurrenceRule;
@@ -107,6 +124,38 @@ public class Task extends BaseEntity {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public FeelsLikeLabel getEnergyOverride() {
+        return energyOverride;
+    }
+
+    public void setEnergyOverride(FeelsLikeLabel energyOverride) {
+        this.energyOverride = energyOverride;
+    }
+
+    public FeelsLikeLabel getEnjoymentOverride() {
+        return enjoymentOverride;
+    }
+
+    public void setEnjoymentOverride(FeelsLikeLabel enjoymentOverride) {
+        this.enjoymentOverride = enjoymentOverride;
+    }
+
+    public FeelsLikeLabel getPressureOverride() {
+        return pressureOverride;
+    }
+
+    public void setPressureOverride(FeelsLikeLabel pressureOverride) {
+        this.pressureOverride = pressureOverride;
+    }
+
+    public FeelsLikeLabel getEffortOverride() {
+        return effortOverride;
+    }
+
+    public void setEffortOverride(FeelsLikeLabel effortOverride) {
+        this.effortOverride = effortOverride;
     }
 
     public TaskRecurrenceRule getRecurrenceRule() {

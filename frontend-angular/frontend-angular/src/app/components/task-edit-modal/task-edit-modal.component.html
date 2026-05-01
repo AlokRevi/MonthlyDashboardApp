@@ -15,7 +15,7 @@
         Category
         <select [(ngModel)]="editTaskCategoryId">
           @for (category of availableCategories; track category.id) {
-          <option [value]="category.id">{{ category.name }}</option>
+          <option [ngValue]="category.id">{{ category.name }}</option>
           }
         </select>
         @if (fieldErrors['editTaskCategory']) {
@@ -141,6 +141,48 @@
       </label>
     </div>
     }
+
+    <div class="form-row profile-row">
+      <label>
+        Energy
+        <select [(ngModel)]="editEnergyOverride">
+          <option value="">Use category default</option>
+          @for (option of energyOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Enjoyment
+        <select [(ngModel)]="editEnjoymentOverride">
+          <option value="">Use category default</option>
+          @for (option of enjoymentOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Pressure
+        <select [(ngModel)]="editPressureOverride">
+          <option value="">Use category default</option>
+          @for (option of pressureOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Effort
+        <select [(ngModel)]="editEffortOverride">
+          <option value="">Use category default</option>
+          @for (option of effortOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </label>
+    </div>
 
     <div class="modal-actions">
       <button type="button" class="secondary-button" (click)="close.emit()">Cancel</button>

@@ -8,7 +8,7 @@
     (click)="$event.stopPropagation()">
     <header class="dialog-header">
       <div>
-        <h2 id="category-dialog-title">Create Category</h2>
+        <h2 id="category-dialog-title">{{ dialogTitle }}</h2>
         <p>Set the default profile for tasks in this category.</p>
       </div>
 
@@ -110,8 +110,8 @@
         Cancel
       </button>
 
-      <button type="button" class="primary-button" [disabled]="saving" (click)="onCreate()">
-        {{ saving ? 'Saving...' : 'Create Category' }}
+      <button type="button" class="primary-button" [disabled]="saving" (click)="onSave()">
+        {{ primaryActionLabel }}
       </button>
     </footer>
   </section>

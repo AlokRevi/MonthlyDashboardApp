@@ -1,5 +1,6 @@
 package com.alok.monthlydashboard.service;
 
+import com.alok.monthlydashboard.common.enums.FeelsLikeLabel;
 import com.alok.monthlydashboard.common.enums.IntervalUnit;
 import com.alok.monthlydashboard.common.enums.RecurrenceType;
 import com.alok.monthlydashboard.common.enums.TaskEditScope;
@@ -230,6 +231,21 @@ class TaskEditRegressionTest {
                 .isEqualTo(15);
     }
 
+    @Test
+    void editingTaskCanStoreOptionalProfileOverrides() {
+        taskService.updateTask(100L, updateRequestWithProfileOverrides(
+                FeelsLikeLabel.ENERGIZING,
+                FeelsLikeLabel.FUN,
+                null,
+                FeelsLikeLabel.HARD
+        ));
+
+        assertThat(task.getEnergyOverride()).isEqualTo(FeelsLikeLabel.ENERGIZING);
+        assertThat(task.getEnjoymentOverride()).isEqualTo(FeelsLikeLabel.FUN);
+        assertThat(task.getPressureOverride()).isNull();
+        assertThat(task.getEffortOverride()).isEqualTo(FeelsLikeLabel.HARD);
+    }
+
     private List<Integer> daysInApril() {
         return recurrenceService.generateOccurrencesForMonth(100L, 2026, 4)
                 .stream()
@@ -261,6 +277,10 @@ class TaskEditRegressionTest {
                 isActive,
                 null,
                 null,
+                null,
+                null,
+                null,
+                null,
                 rule
         );
     }
@@ -282,7 +302,35 @@ class TaskEditRegressionTest {
                 true,
                 editScope,
                 selectedOccurrenceDate,
+                null,
+                null,
+                null,
+                null,
                 rule
+        );
+    }
+
+    private UpdateTaskRequest updateRequestWithProfileOverrides(
+            FeelsLikeLabel energyOverride,
+            FeelsLikeLabel enjoymentOverride,
+            FeelsLikeLabel pressureOverride,
+            FeelsLikeLabel effortOverride
+    ) {
+        return new UpdateTaskRequest(
+                1L,
+                "Edited Task",
+                "Updated",
+                RecurrenceType.FIXED_DATE,
+                LocalDate.of(2026, 4, 1),
+                null,
+                true,
+                null,
+                null,
+                energyOverride,
+                enjoymentOverride,
+                pressureOverride,
+                effortOverride,
+                new TaskRuleRequest(List.of(20), null, null, null, null, true)
         );
     }
 

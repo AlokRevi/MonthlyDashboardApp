@@ -175,6 +175,10 @@ export interface UpdateTaskRequest {
   isActive?: boolean;
   editScope?: TaskEditScope;
   selectedOccurrenceDate?: string;
+  energyOverride?: FeelsLikeLabel | null;
+  enjoymentOverride?: FeelsLikeLabel | null;
+  pressureOverride?: FeelsLikeLabel | null;
+  effortOverride?: FeelsLikeLabel | null;
   rule: TaskRuleRequest;
 }
 
@@ -188,5 +192,9 @@ export interface TaskResponse {
   startDate: string;
   endDate: string | null;
   isActive: boolean;
+  energyOverride?: FeelsLikeLabel | null;
+  enjoymentOverride?: FeelsLikeLabel | null;
+  pressureOverride?: FeelsLikeLabel | null;
+  effortOverride?: FeelsLikeLabel | null;
   rule?: TaskRuleRequest;
 }
