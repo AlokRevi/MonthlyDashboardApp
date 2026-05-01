@@ -8,7 +8,7 @@ Monthly Dashboard is a Spring Boot and Angular app for managing recurring respon
 - Generates monthly occurrences dynamically from recurrence rules.
 - Tracks completion history by `occurrenceDate`.
 - Shows overdue, due-today, upcoming, and completed occurrences.
-- Groups the Today Checklist by category requirement.
+- Groups the Today Checklist by category requirement, with completed items undoable from the checkmark.
 - Exports current system data as JSON for backup.
 - Supports a focused mobile view for checklist and task entry.
 
@@ -21,12 +21,13 @@ Monthly Dashboard is a Spring Boot and Angular app for managing recurring respon
 - Softer monthly grid colors with progressive past-day styling.
 - Category metadata:
   - `requires`: `FOCUS`, `MOVEMENT`, `OUTDOOR`
-  - category profile values carried through the current API model
-- Category creation through a dialog.
+  - structured category profile defaults: `energy`, `enjoyment`, `pressure`, `effort`
+- Category create/edit dialog with access from the Add Task flow, monthly occurrence section, and right-side Categories panel.
 - Backend-generated recurrence summaries for category/task displays.
 - Today Checklist grouped by category `requires`.
 - Interval recurrence supports `DAYS`, `WEEKS`, and `MONTHS`.
 - Safe scoped task editing for future changes.
+- Optional task-level profile overrides for `energy`, `enjoyment`, `pressure`, and `effort`.
 
 ## Recurrence Support
 
@@ -54,8 +55,40 @@ Both scopes use a safe split model:
 Not implemented:
 
 - true `THIS_OCCURRENCE`
-- per-occurrence overrides
+- per-occurrence overrides for task edits
 - rewriting historical recurrence meaning
+
+## Category Profiles
+
+Category-level profile fields are the defaults for tasks in that category:
+
+- `requires`
+- `energy`
+- `enjoyment`
+- `pressure`
+- `effort`
+
+The category dialog supports both create and edit mode. Categories can be edited from:
+
+- the monthly occurrence section
+- the right-side Categories panel
+
+Task-level profile fields in the Edit Task modal are optional overrides. A `null` task override means "use category default" for that profile field.
+
+Profile value groups:
+
+- Energy: `DEATHLY_DRAINING`, `TIRING`, `ACTIVATING`, `ENERGIZING`
+- Enjoyment: `BORING`, `OKAY`, `FUN`, `BLISSFUL`
+- Pressure: `NO_PRESSURE`, `MILD_FUTURE_STRESS`, `URGENT_AND_IMPORTANT`, `AMORPHOUS_DREAD`
+- Effort: `EASY`, `MEDIUM`, `HARD`, `VERY_HARD`
+
+## Checklist Actions
+
+The Today Checklist is the primary completion surface:
+
+- incomplete overdue and due-today items can be marked complete
+- completed-today items show a checkmark
+- clicking the completed checkmark undoes that completion
 
 ## Mobile Behavior
 
@@ -150,5 +183,5 @@ npm run build
 - The app enforces a maximum of 15 active tasks.
 - Import is not implemented yet.
 - True single-occurrence editing is deferred.
-- Task-level profile overrides are deferred.
+- Task-level profile overrides exist, but they are simple optional fields only; they do not change recurrence or completion behavior.
 - The monthly grid is intentionally read-only; checklist actions are the primary completion flow.
