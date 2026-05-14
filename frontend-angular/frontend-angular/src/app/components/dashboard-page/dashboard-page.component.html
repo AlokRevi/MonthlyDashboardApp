@@ -35,19 +35,58 @@
     </app-month-navigation>
   </header>
 
-  <app-task-create-form
-    [availableCategories]="state.availableCategories()"
-    [taskSaving]="state.taskSaving()"
-    [taskCreateSuccessCount]="state.taskCreateSuccessCount()"
-    [categorySaving]="state.categorySaving()"
-    [recurrenceOptions]="recurrenceOptions"
-    [intervalUnitOptions]="intervalUnitOptions"
-    [weekdayOptions]="weekdayOptions"
-    [weekOfMonthOptions]="weekOfMonthOptions"
-    (createTask)="state.createTask($event)"
-    (openCategoryDialog)="state.openCategoryCreateDialog()"
-    (validationError)="state.showError($event)">
-  </app-task-create-form>
+  <section class="quick-actions-panel">
+    <button
+      type="button"
+      class="quick-action-button primary-action"
+      (click)="state.openTaskCreateScreen()">
+      Add Task
+    </button>
+
+    <button
+      type="button"
+      class="quick-action-button secondary-action"
+      [disabled]="state.categorySaving()"
+      (click)="state.openCategoryCreateDialog()">
+      Add Category
+    </button>
+  </section>
+
+  @if (state.taskCreateScreenOpen()) {
+  <section class="task-create-screen">
+    <header class="task-create-screen-header">
+      <div>
+        <h2>Add Task</h2>
+        <p>Create a recurring task for the monthly dashboard.</p>
+      </div>
+
+      <button
+        type="button"
+        class="screen-close-button"
+        [disabled]="state.taskSaving()"
+        (click)="state.closeTaskCreateScreen()">
+        Close
+      </button>
+    </header>
+
+    <app-task-create-form
+      [availableCategories]="state.availableCategories()"
+      [taskSaving]="state.taskSaving()"
+      [taskCreateSuccessCount]="state.taskCreateSuccessCount()"
+      [categorySaving]="state.categorySaving()"
+      [preselectedCategoryId]="state.taskCreateCategoryId()"
+      [showHeader]="false"
+      [recurrenceOptions]="recurrenceOptions"
+      [intervalUnitOptions]="intervalUnitOptions"
+      [weekdayOptions]="weekdayOptions"
+      [weekOfMonthOptions]="weekOfMonthOptions"
+      (createTask)="state.createTask($event)"
+      (openCategoryDialog)="state.openCategoryCreateDialog()"
+      (cancel)="state.closeTaskCreateScreen()"
+      (validationError)="state.showError($event)">
+    </app-task-create-form>
+  </section>
+  }
 
   <app-category-create-dialog
     [open]="state.categoryCreateDialogOpen()"
@@ -123,6 +162,8 @@
       <app-category-manager
         [categories]="state.availableCategories()"
         [dashboard]="state.dashboard()"
+        (addTaskForCategory)="state.openTaskCreateScreen($event)"
+        (createCategory)="state.openCategoryCreateDialog()"
         (deleteCategory)="state.deleteCategory($event)"
         (editCategory)="state.openCategoryEditDialog($event)">
       </app-category-manager>

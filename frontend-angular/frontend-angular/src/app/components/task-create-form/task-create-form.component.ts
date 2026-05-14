@@ -24,6 +24,8 @@ export class TaskCreateFormComponent implements OnChanges {
   @Input() taskSaving = false;
   @Input() categorySaving = false;
   @Input() taskCreateSuccessCount = 0;
+  @Input() preselectedCategoryId: number | null = null;
+  @Input() showHeader = true;
   @Input() recurrenceOptions: { value: RecurrenceType; label: string }[] = [];
   @Input() intervalUnitOptions: { value: IntervalUnit; label: string }[] = [];
   @Input() weekdayOptions: string[] = [];
@@ -31,6 +33,7 @@ export class TaskCreateFormComponent implements OnChanges {
 
   @Output() createTask = new EventEmitter<CreateTaskRequest>();
   @Output() openCategoryDialog = new EventEmitter<void>();
+  @Output() cancel = new EventEmitter<void>();
   @Output() validationError = new EventEmitter<string>();
 
   fieldErrors: Record<string, string> = {};
@@ -58,6 +61,10 @@ export class TaskCreateFormComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['availableCategories']) {
       this.initializeSelectedCategory();
+    }
+
+    if (changes['preselectedCategoryId']) {
+      this.applyPreselectedCategory();
     }
 
     if (
@@ -216,12 +223,28 @@ export class TaskCreateFormComponent implements OnChanges {
   }
 
   private initializeSelectedCategory(): void {
+    if (this.applyPreselectedCategory()) {
+      return;
+    }
+
     if (
       this.availableCategories.length > 0
       && !this.availableCategories.some(category => category.id === this.newTaskCategoryId)
     ) {
       this.newTaskCategoryId = this.availableCategories[0].id;
     }
+  }
+
+  private applyPreselectedCategory(): boolean {
+    if (
+      this.preselectedCategoryId
+      && this.availableCategories.some(category => category.id === this.preselectedCategoryId)
+    ) {
+      this.newTaskCategoryId = this.preselectedCategoryId;
+      return true;
+    }
+
+    return false;
   }
 
   private validateFixedDatesField(): void {

@@ -7,9 +7,42 @@
   box-shadow: 0 14px 35px rgba(15, 23, 42, 0.08);
 }
 
+.category-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
 .category-cleanup h2 {
   margin: 0 0 8px;
   font-size: 19px;
+}
+
+.category-panel-header h2 {
+  margin-bottom: 0;
+}
+
+.category-add-button,
+.category-task-add-button {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #bbf7d0;
+  border-radius: 999px;
+  background: #f0fdf4;
+  color: #15803d;
+  padding: 0;
+  font-family: inherit;
+  font-size: 17px;
+  line-height: 1;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.category-add-button:hover,
+.category-task-add-button:hover {
+  background: #dcfce7;
 }
 
 .empty-small {
@@ -52,7 +85,7 @@
   border-radius: 999px;
   background: white;
   color: #1f2937;
-  padding: 5px 10px;
+  padding: 5px 72px 5px 10px;
   text-align: left;
   font-family: inherit;
   font-size: 12px;
@@ -63,7 +96,7 @@
 .category-edit-button {
   position: absolute;
   top: 12px;
-  right: 28px;
+  right: 58px;
   width: 24px;
   height: 24px;
   border: 1px solid #bfdbfe;
@@ -78,6 +111,13 @@
 
 .category-edit-button:hover {
   background: #dbeafe;
+}
+
+.category-task-add-button {
+  position: absolute;
+  top: 12px;
+  right: 28px;
+  font-size: 16px;
 }
 
 .category-summary-button:hover {

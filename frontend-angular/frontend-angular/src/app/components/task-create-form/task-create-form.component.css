@@ -108,8 +108,16 @@ button:disabled {
   min-width: auto;
 }
 
-.add-task-button {
+.form-actions {
   margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.add-task-button {
+  margin-top: 0;
 }
 
 .empty-category-row {
@@ -140,6 +148,11 @@ button:disabled {
   .form-row label,
   button {
     width: 100%;
+  }
+
+  .form-actions {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .quick-form {

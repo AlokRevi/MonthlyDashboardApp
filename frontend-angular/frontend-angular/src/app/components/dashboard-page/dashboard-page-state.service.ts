@@ -28,6 +28,8 @@ export class DashboardPageStateService {
   successMessage = signal('');
   taskSaving = signal(false);
   taskCreateSuccessCount = signal(0);
+  taskCreateScreenOpen = signal(false);
+  taskCreateCategoryId = signal<number | null>(null);
   categorySaving = signal(false);
   categoryCreateDialogOpen = signal(false);
   categoryBeingEdited = signal<CategoryResponse | null>(null);
@@ -127,6 +129,7 @@ export class DashboardPageStateService {
       next: () => {
         this.taskSaving.set(false);
         this.taskCreateSuccessCount.update(count => count + 1);
+        this.closeTaskCreateScreen();
         this.showSuccess('Task created.');
         this.loadDashboard();
       },
@@ -136,6 +139,16 @@ export class DashboardPageStateService {
         this.showError(this.buildApiErrorMessage('Could not create task', error));
       }
     });
+  }
+
+  openTaskCreateScreen(categoryId: number | null = null): void {
+    this.taskCreateCategoryId.set(categoryId);
+    this.taskCreateScreenOpen.set(true);
+  }
+
+  closeTaskCreateScreen(): void {
+    this.taskCreateScreenOpen.set(false);
+    this.taskCreateCategoryId.set(null);
   }
 
   createCategory(request: CreateCategoryRequest): void {

@@ -1,5 +1,16 @@
 <section class="category-cleanup">
-  <h2>Categories</h2>
+  <div class="category-panel-header">
+    <h2>Categories</h2>
+
+    <button
+      type="button"
+      class="category-add-button"
+      title="Create category"
+      aria-label="Create category"
+      (click)="createCategory.emit()">
+      +
+    </button>
+  </div>
 
   @if (categories.length === 0) {
   <p class="empty-small">No categories yet.</p>
@@ -36,6 +47,15 @@
       aria-label="Edit category"
       (click)="editCategory.emit(category.id); $event.stopPropagation()">
       ✎
+    </button>
+
+    <button
+      type="button"
+      class="category-task-add-button"
+      title="Add task to category"
+      aria-label="Add task to category"
+      (click)="addTaskForCategory.emit(category.id); $event.stopPropagation()">
+      +
     </button>
 
     @if (category.taskCount === 0) {

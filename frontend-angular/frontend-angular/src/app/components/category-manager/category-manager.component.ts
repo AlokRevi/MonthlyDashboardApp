@@ -34,6 +34,8 @@ export class CategoryManagerComponent implements OnChanges {
 
   @Output() deleteCategory = new EventEmitter<number>();
   @Output() editCategory = new EventEmitter<number>();
+  @Output() addTaskForCategory = new EventEmitter<number>();
+  @Output() createCategory = new EventEmitter<void>();
 
   expandedCategoryId: number | null = null;
   categoryTaskItemsById: Record<number, CategoryTaskItem[]> = {};
