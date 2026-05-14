@@ -1,8 +1,8 @@
 .timeline-card {
   min-width: 900px;
-  border: 1px solid #dbe3ef;
+  border: 1px solid var(--border-subtle);
   border-radius: 18px;
-  background: #f8fafc;
+  background: var(--surface-subtle);
   padding: 18px;
   margin-bottom: 20px;
 }
@@ -44,7 +44,7 @@
   left: 50%;
   width: calc(100% + 5px);
   height: 3px;
-  background: #111827;
+  background: var(--scale-line);
 }
 
 .scale-cell:last-child::before {
@@ -55,7 +55,7 @@
   display: block;
   width: 4px;
   height: 24px;
-  background: #111827;
+  background: var(--scale-line);
   margin: 0 auto 2px;
   border-radius: 999px;
 }
@@ -68,9 +68,9 @@
 .day-cell {
   position: relative;
   height: 30px;
-  border: 1px solid #d5dee9;
+  border: 1px solid var(--grid-line);
   border-radius: 7px;
-  background: white;
+  background: var(--surface-panel);
   text-align: center;
   font-size: 12px;
   font-weight: 700;
@@ -78,51 +78,51 @@
 }
 
 .day-cell.saturday {
-  background: #fff1f2;
+  background: var(--weekend-saturday-bg);
 }
 
 .day-cell.sunday {
-  background: #ffe4e6;
+  background: var(--weekend-sunday-bg);
 }
 
 .day-cell.wednesday {
-  background: #f1f5f9;
+  background: var(--weekday-marker-bg);
 }
 
 .day-cell.past-recent {
-  background: #f5f7fa;
-  color: #64748b;
+  background: var(--past-recent-bg);
+  color: var(--past-muted-text);
 }
 
 .day-cell.past-mid {
-  background: #eef2f6;
-  color: #64748b;
+  background: var(--past-mid-bg);
+  color: var(--past-muted-text);
 }
 
 .day-cell.past-old {
-  background: #e7ecf2;
-  color: #64748b;
+  background: var(--past-old-bg);
+  color: var(--past-muted-text);
 }
 
 .day-cell.saturday.past-recent,
 .day-cell.sunday.past-recent {
-  background: #fae8ea;
+  background: var(--past-weekend-recent-bg);
 }
 
 .day-cell.saturday.past-mid,
 .day-cell.sunday.past-mid {
-  background: #f3dde1;
+  background: var(--past-weekend-mid-bg);
 }
 
 .day-cell.saturday.past-old,
 .day-cell.sunday.past-old {
-  background: #ead2d8;
+  background: var(--past-weekend-old-bg);
 }
 
 .day-cell.today {
-  border: 3px solid #2563eb;
-  background: white;
-  color: #1d4ed8;
+  border: 3px solid var(--today-border);
+  background: var(--today-bg);
+  color: var(--today-text);
   line-height: 26px;
 }
 
@@ -131,8 +131,8 @@
   top: -24px;
   left: 50%;
   transform: translateX(-50%);
-  background: #2563eb;
-  color: white;
+  background: var(--today-label-bg);
+  color: var(--text-inverse);
   border-radius: 999px;
   padding: 3px 7px;
   white-space: nowrap;

@@ -57,7 +57,76 @@
       (click)="state.exportSetupSnapshot()">
       Export Setup
     </button>
+
+    <button
+      type="button"
+      class="quick-action-button import-action"
+      [disabled]="state.setupImportPreviewing() || state.setupImporting()"
+      (click)="setupImportFile.click()">
+      Import Setup
+    </button>
+
+    <input
+      #setupImportFile
+      type="file"
+      class="setup-import-input"
+      accept="application/json,.json"
+      (change)="state.previewSetupImportFile($event)" />
   </section>
+
+  @if (state.setupImportPreview(); as preview) {
+  <section class="setup-import-preview">
+    <header class="setup-import-preview-header">
+      <div>
+        <h2>Import Setup Preview</h2>
+        <p>{{ preview.version || 'Unknown version' }}</p>
+      </div>
+
+      <button
+        type="button"
+        class="screen-close-button"
+        [disabled]="state.setupImporting()"
+        (click)="state.clearSetupImportPreview()">
+        Clear
+      </button>
+    </header>
+
+    <div class="setup-import-counts">
+      <span>{{ preview.categoryCount }} categories</span>
+      <span>{{ preview.taskCount }} tasks</span>
+      <span>{{ preview.activeTaskCount }} active</span>
+      <span>{{ preview.inactiveTaskCount }} inactive</span>
+    </div>
+
+    @if (preview.warnings.length > 0) {
+    <div class="setup-import-message warning-message">
+      <strong>Warnings</strong>
+      @for (warning of preview.warnings; track warning) {
+      <p>{{ warning }}</p>
+      }
+    </div>
+    }
+
+    @if (preview.errors.length > 0) {
+    <div class="setup-import-message error-message">
+      <strong>Errors</strong>
+      @for (error of preview.errors; track error) {
+      <p>{{ error }}</p>
+      }
+    </div>
+    }
+
+    @if (preview.valid) {
+    <button
+      type="button"
+      class="quick-action-button primary-action"
+      [disabled]="state.setupImporting()"
+      (click)="state.importSetupSnapshot()">
+      {{ state.setupImporting() ? 'Importing...' : 'Confirm Import' }}
+    </button>
+    }
+  </section>
+  }
 
   @if (state.taskCreateScreenOpen()) {
   <section class="task-create-screen">

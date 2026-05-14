@@ -244,3 +244,25 @@ export interface SetupSnapshotRule {
   weekday: string | null;
   weekOfMonth: WeekOfMonth | null;
 }
+
+export interface SetupImportPreviewResponse {
+  valid: boolean;
+  version: string | null;
+  categoryCount: number;
+  taskCount: number;
+  activeTaskCount: number;
+  inactiveTaskCount: number;
+  warnings: string[];
+  errors: string[];
+}
+
+export interface SetupImportResultResponse {
+  imported: boolean;
+  mode: 'EMPTY_ONLY';
+  categoryCount: number;
+  taskCount: number;
+  activeTaskCount: number;
+  inactiveTaskCount: number;
+  warnings: string[];
+  errors: string[];
+}

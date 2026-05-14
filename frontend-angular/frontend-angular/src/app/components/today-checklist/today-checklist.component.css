@@ -1,9 +1,9 @@
 .today-card {
-  background: white;
-  border: 1px solid #dbe3ef;
+  background: var(--surface-panel);
+  border: 1px solid var(--border-subtle);
   border-radius: 18px;
   padding: 14px;
-  box-shadow: 0 14px 35px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--shadow-panel);
 }
 
 .today-header {
@@ -18,7 +18,7 @@
 
 .today-header p {
   margin: 4px 0 0;
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 12px;
   font-weight: 700;
 }
@@ -37,7 +37,7 @@
 
 .checklist-group h3 {
   margin: 2px 0 0;
-  color: #475569;
+  color: var(--text-secondary);
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.02em;
@@ -50,9 +50,9 @@
   grid-template-columns: 1fr 34px;
   align-items: center;
   gap: 10px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--checklist-row-border);
   border-radius: 12px;
-  background: #f8fafc;
+  background: var(--checklist-row-bg);
   padding: 9px 10px;
 }
 
@@ -68,7 +68,7 @@
 }
 
 .item-title-line strong {
-  color: #1f2937;
+  color: var(--text-primary);
   font-size: 13px;
   line-height: 1.2;
 }
@@ -76,7 +76,7 @@
 .category-color-dot {
   width: 10px;
   height: 10px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border-muted);
   border-radius: 999px;
   flex: 0 0 auto;
 }
@@ -89,13 +89,13 @@
 }
 
 .status-due {
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: var(--status-due-bg);
+  color: var(--status-due-text);
 }
 
 .status-overdue {
-  background: #ffedd5;
-  color: #c2410c;
+  background: var(--status-overdue-bg);
+  color: var(--status-overdue-text);
 }
 
 .date-action-button,
@@ -115,15 +115,15 @@
 }
 
 .due-date-button {
-  background: #dbeafe;
-  border-color: #60a5fa;
-  color: #1e3a8a;
+  background: var(--status-due-bg);
+  border-color: var(--date-due-border);
+  color: var(--accent-strong-text);
 }
 
 .overdue-date-button {
-  background: #fdba74;
-  border-color: #fb923c;
-  color: #7c2d12;
+  background: var(--date-overdue-bg);
+  border-color: var(--date-overdue-border);
+  color: var(--date-overdue-text);
 }
 
 .date-action-button:hover {
@@ -131,34 +131,34 @@
 }
 
 .status-completed {
-  background: #dcfce7;
-  color: #166534;
+  background: var(--status-completed-bg);
+  color: var(--status-completed-text);
 }
 
 .completed-today-section {
   margin-top: 6px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--checklist-row-border);
   padding-top: 8px;
 }
 
 .completed-today-section h3 {
   margin: 0 0 8px;
-  color: #475569;
+  color: var(--text-secondary);
   font-size: 12px;
   font-weight: 800;
 }
 
 .completed-row {
-  background: #f0fdf4;
-  border-color: #bbf7d0;
+  background: var(--success-soft-bg);
+  border-color: var(--success-muted-border);
 }
 
 .completed-indicator {
   width: 34px;
   height: 34px;
-  border: 1px solid #bbf7d0;
-  background: #dcfce7;
-  color: #166534;
+  border: 1px solid var(--success-muted-border);
+  background: var(--success-bg);
+  color: var(--success-text);
 }
 
 .completed-action-button {
@@ -167,14 +167,14 @@
 }
 
 .completed-action-button:hover {
-  background: #bbf7d0;
+  background: var(--success-muted-border);
   transform: scale(1.04);
 }
 
 .empty-state {
   text-align: center;
   padding: 18px 8px;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .empty-icon {
@@ -182,8 +182,8 @@
   height: 42px;
   margin: 0 auto 8px;
   border-radius: 999px;
-  background: #dcfce7;
-  color: #166534;
+  background: var(--success-bg);
+  color: var(--success-text);
   display: grid;
   place-items: center;
   font-size: 24px;
@@ -192,7 +192,7 @@
 
 .empty-state strong {
   display: block;
-  color: #1f2937;
+  color: var(--text-primary);
   font-size: 14px;
 }
 

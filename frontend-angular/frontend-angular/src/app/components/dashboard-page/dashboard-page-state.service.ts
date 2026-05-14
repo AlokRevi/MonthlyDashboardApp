@@ -6,6 +6,7 @@ import {
   CreateCategoryRequest,
   CreateTaskRequest,
   MonthlyDashboardResponse,
+  SetupImportPreviewResponse,
   TaskResponse,
   TodayChecklistResponse,
   UpdateCategoryRequest,
@@ -33,6 +34,10 @@ export class DashboardPageStateService {
   categorySaving = signal(false);
   categoryCreateDialogOpen = signal(false);
   categoryBeingEdited = signal<CategoryResponse | null>(null);
+  setupImportPreview = signal<SetupImportPreviewResponse | null>(null);
+  setupImportSnapshot = signal<unknown | null>(null);
+  setupImportPreviewing = signal(false);
+  setupImporting = signal(false);
 
   editModalOpen = signal(false);
   editTaskId = signal<number | null>(null);
@@ -296,6 +301,81 @@ export class DashboardPageStateService {
         this.showError('Could not export setup snapshot.');
       }
     });
+  }
+
+  previewSetupImportFile(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+
+    if (!file) {
+      return;
+    }
+
+    if (!file.name.toLowerCase().endsWith('.json')) {
+      this.showError('Choose a JSON setup snapshot file.');
+      return;
+    }
+
+    this.setupImportPreviewing.set(true);
+    this.setupImportPreview.set(null);
+    this.setupImportSnapshot.set(null);
+
+    file.text()
+      .then(text => {
+        const snapshot = JSON.parse(text) as unknown;
+
+        this.dashboardApi.previewSetupImport(snapshot).subscribe({
+          next: (preview) => {
+            this.setupImportPreviewing.set(false);
+            this.setupImportPreview.set(preview);
+            this.setupImportSnapshot.set(snapshot);
+            this.clearMessages();
+          },
+          error: (error) => {
+            console.error('Preview setup import failed:', error);
+            this.setupImportPreviewing.set(false);
+            this.showError(this.buildApiErrorMessage('Could not preview setup snapshot', error));
+          }
+        });
+      })
+      .catch(error => {
+        console.error('Read setup import file failed:', error);
+        this.setupImportPreviewing.set(false);
+        this.showError('Could not read setup snapshot file.');
+      });
+  }
+
+  importSetupSnapshot(): void {
+    const snapshot = this.setupImportSnapshot();
+    const preview = this.setupImportPreview();
+
+    if (!snapshot || !preview?.valid) {
+      this.showError('Preview a valid setup snapshot before importing.');
+      return;
+    }
+
+    this.setupImporting.set(true);
+
+    this.dashboardApi.importSetupSnapshot(snapshot).subscribe({
+      next: () => {
+        this.setupImporting.set(false);
+        this.setupImportPreview.set(null);
+        this.setupImportSnapshot.set(null);
+        this.showSuccess('Setup snapshot imported.');
+        this.loadDashboard();
+      },
+      error: (error) => {
+        console.error('Import setup snapshot failed:', error);
+        this.setupImporting.set(false);
+        this.showError(this.buildApiErrorMessage('Could not import setup snapshot', error));
+      }
+    });
+  }
+
+  clearSetupImportPreview(): void {
+    this.setupImportPreview.set(null);
+    this.setupImportSnapshot.set(null);
   }
 
   deleteTask(taskId: number): void {

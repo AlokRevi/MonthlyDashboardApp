@@ -13,6 +13,8 @@ import {
   UpdateCategoryRequest,
   UpdateTaskRequest,
   TaskResponse,
+  SetupImportPreviewResponse,
+  SetupImportResultResponse,
   SetupSnapshotResponse
 } from '../models/dashboard.models';
 
@@ -45,6 +47,20 @@ export class DashboardApiService {
   getSetupSnapshot(): Observable<SetupSnapshotResponse> {
     return this.http.get<SetupSnapshotResponse>(
       `${this.apiBase}/export/setup`
+    );
+  }
+
+  previewSetupImport(snapshot: unknown): Observable<SetupImportPreviewResponse> {
+    return this.http.post<SetupImportPreviewResponse>(
+      `${this.apiBase}/import/setup/preview`,
+      snapshot
+    );
+  }
+
+  importSetupSnapshot(snapshot: unknown): Observable<SetupImportResultResponse> {
+    return this.http.post<SetupImportResultResponse>(
+      `${this.apiBase}/import/setup?mode=EMPTY_ONLY`,
+      snapshot
     );
   }
 

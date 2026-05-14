@@ -1,6 +1,95 @@
 /* App-wide font setup */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
+:root,
+.theme-default {
+  --app-bg: #eef3f9;
+  --app-root-bg: linear-gradient(180deg, #f7f9fd 0%, #eef2f8 100%);
+  --app-root-text: #1b2430;
+  --surface-panel: #ffffff;
+  --surface-subtle: #f8fafc;
+  --surface-hover: #f8fafc;
+  --text-primary: #1f2937;
+  --text-strong: #111827;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-inverse: #ffffff;
+  --border-subtle: #dbe3ef;
+  --border-muted: #cbd5e1;
+  --grid-line: #d5dee9;
+  --divider: #e5e7eb;
+  --shadow-panel: 0 14px 35px rgba(15, 23, 42, 0.08);
+  --shadow-subtle: 0 10px 28px rgba(15, 23, 42, 0.06);
+
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-soft: #eff6ff;
+  --accent-softer: #dbeafe;
+  --accent-border: #bfdbfe;
+  --accent-strong-text: #1e3a8a;
+
+  --success-bg: #dcfce7;
+  --success-soft-bg: #f0fdf4;
+  --success-border: #86efac;
+  --success-muted-border: #bbf7d0;
+  --success-text: #166534;
+  --success-action: #16a34a;
+  --success-action-hover: #15803d;
+
+  --danger-bg: #fff1f2;
+  --danger-border: #fecaca;
+  --danger-text: #b91c1c;
+  --danger-strong-text: #be123c;
+  --warning-bg: #fefce8;
+  --warning-border: #facc15;
+  --warning-text: #854d0e;
+
+  --today-bg: #ffffff;
+  --today-border: #2563eb;
+  --today-text: #1d4ed8;
+  --today-label-bg: #2563eb;
+  --weekend-saturday-bg: #fff1f2;
+  --weekend-sunday-bg: #ffe4e6;
+  --weekday-marker-bg: #f1f5f9;
+  --past-recent-bg: #f5f7fa;
+  --past-mid-bg: #eef2f6;
+  --past-old-bg: #e7ecf2;
+  --past-weekend-recent-bg: #fae8ea;
+  --past-weekend-mid-bg: #f3dde1;
+  --past-weekend-old-bg: #ead2d8;
+  --past-muted-text: #64748b;
+
+  --scale-line: #111827;
+  --occurrence-upcoming-bg: #ffffff;
+  --occurrence-upcoming-border: #d5dee9;
+  --occurrence-upcoming-text: #334155;
+  --occurrence-completed-bg: #d8f7e2;
+  --occurrence-completed-border: #9ee8b5;
+  --occurrence-completed-text: #166534;
+  --occurrence-completed-tick: #15803d;
+  --occurrence-overdue-bg: #fde7c7;
+  --occurrence-overdue-border: #f8c486;
+  --occurrence-overdue-text: #92400e;
+  --occurrence-due-bg: #dbeafe;
+  --occurrence-due-border: #93c5fd;
+  --occurrence-due-text: #1e3a8a;
+  --occurrence-past-overlay: rgb(148 163 184 / 0.08);
+
+  --checklist-row-bg: #f8fafc;
+  --checklist-row-border: #e2e8f0;
+  --status-due-bg: #dbeafe;
+  --status-due-text: #1d4ed8;
+  --status-overdue-bg: #ffedd5;
+  --status-overdue-text: #c2410c;
+  --status-completed-bg: #dcfce7;
+  --status-completed-text: #166534;
+  --date-due-border: #60a5fa;
+  --date-overdue-bg: #fdba74;
+  --date-overdue-border: #fb923c;
+  --date-overdue-text: #7c2d12;
+  --category-fallback-color: #94a3b8;
+}
+
 html,
 body {
   margin: 0;

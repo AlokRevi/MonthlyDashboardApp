@@ -194,7 +194,7 @@ public class ExportServiceImpl implements ExportService {
                         .sorted(Comparator.comparing(TaskFixedDate::getDayOfMonth))
                         .map(TaskFixedDate::getDayOfMonth)
                         .toList(),
-                rule == null ? null : rule.isFallbackToLastDay(),
+                rule == null || rule.isFallbackToLastDay(),
                 rule == null ? null : rule.getIntervalValue(),
                 rule == null ? null : rule.getIntervalUnit(),
                 rule == null ? null : rule.getWeekday(),
