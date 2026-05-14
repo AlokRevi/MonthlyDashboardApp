@@ -62,7 +62,7 @@ public class ChecklistServiceImpl implements ChecklistService {
                         .findByTaskIdAndOccurrenceDate(task.getId(), occurrenceDate);
 
                 if (completion.isPresent()) {
-                    if (today.equals(completion.get().getCompletionDate())) {
+                    if (occurrenceDate.isEqual(today)) {
                         items.add(new ChecklistItemResponse(
                                 task.getId(),
                                 task.getName(),

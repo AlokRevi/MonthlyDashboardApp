@@ -63,7 +63,7 @@ class ChecklistIntegrationTest {
     }
 
     @Test
-    void tasksDueTodayAppearInTodayChecklist() {
+    void dueTodayIncompleteAppearsInTodayChecklist() {
         Task task = saveFixedDateTask("Flowers", today, today.getDayOfMonth());
 
         TodayChecklistResponse checklist = checklistService.getTodayChecklist();
@@ -80,7 +80,7 @@ class ChecklistIntegrationTest {
     }
 
     @Test
-    void overdueTasksAppearInTodayChecklist() {
+    void overdueIncompleteAppearsInTodayChecklist() {
         LocalDate overdueDate = today.minusDays(1);
         Task task = saveFixedDateTask("Movie Night", overdueDate, overdueDate.getDayOfMonth());
 
@@ -97,7 +97,24 @@ class ChecklistIntegrationTest {
     }
 
     @Test
-    void completedPastOccurrencesAreExcludedFromTodayChecklist() {
+    void dueTodayCompletedAppearsInTodayChecklist() {
+        Task task = saveFixedDateTask("Done Today", today, today.getDayOfMonth());
+        saveCompletion(task, today, today);
+
+        TodayChecklistResponse checklist = checklistService.getTodayChecklist();
+
+        assertThat(checklist.items())
+                .singleElement()
+                .satisfies(item -> {
+                    assertThat(item.taskId()).isEqualTo(task.getId());
+                    assertThat(item.taskName()).isEqualTo("Done Today");
+                    assertThat(item.occurrenceDate()).isEqualTo(today);
+                    assertThat(item.status()).isEqualTo(OccurrenceStatus.COMPLETED);
+                });
+    }
+
+    @Test
+    void overdueCompletedYesterdayDoesNotAppearInTodayChecklist() {
         LocalDate completedOccurrenceDate = today.minusDays(1);
         Task task = saveFixedDateTask(
                 "Already Done",
@@ -105,6 +122,31 @@ class ChecklistIntegrationTest {
                 completedOccurrenceDate.getDayOfMonth()
         );
         saveCompletion(task, completedOccurrenceDate, completedOccurrenceDate);
+
+        TodayChecklistResponse checklist = checklistService.getTodayChecklist();
+
+        assertThat(checklist.items()).isEmpty();
+    }
+
+    @Test
+    void overdueCompletedTodayDoesNotAppearInTodayChecklist() {
+        LocalDate overdueOccurrenceDate = today.minusDays(1);
+        Task task = saveFixedDateTask(
+                "Late Done Today",
+                overdueOccurrenceDate,
+                overdueOccurrenceDate.getDayOfMonth()
+        );
+        saveCompletion(task, overdueOccurrenceDate, today);
+
+        TodayChecklistResponse checklist = checklistService.getTodayChecklist();
+
+        assertThat(checklist.items()).isEmpty();
+    }
+
+    @Test
+    void futureOccurrencesDoNotAppearInTodayChecklist() {
+        LocalDate futureDate = today.plusDays(1);
+        saveFixedDateTask("Future Task", today, futureDate.getDayOfMonth());
 
         TodayChecklistResponse checklist = checklistService.getTodayChecklist();
 
