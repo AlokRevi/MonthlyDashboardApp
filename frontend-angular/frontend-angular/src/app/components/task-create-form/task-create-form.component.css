@@ -57,6 +57,11 @@ input {
   background: white;
 }
 
+.input-invalid {
+  border-color: #ef4444;
+  background: #fff7f7;
+}
+
 button {
   font-family: inherit;
   border: none;

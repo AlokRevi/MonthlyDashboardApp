@@ -51,7 +51,11 @@
 
       <label>
         Start Date
-        <input type="date" [(ngModel)]="newTaskStartDate" />
+        <input
+          type="date"
+          [ngModel]="newTaskStartDate"
+          (ngModelChange)="onStartDateChange($event)"
+          [class.input-invalid]="fieldErrors['taskStartDate']" />
         @if (fieldErrors['taskStartDate']) {
         <span class="field-error">{{ fieldErrors['taskStartDate'] }}</span>
         }
@@ -59,7 +63,11 @@
 
       <label>
         End Date
-        <input type="date" [(ngModel)]="newTaskEndDate" />
+        <input
+          type="date"
+          [ngModel]="newTaskEndDate"
+          (ngModelChange)="onEndDateChange($event)"
+          [class.input-invalid]="fieldErrors['taskEndDate']" />
         @if (fieldErrors['taskEndDate']) {
         <span class="field-error">{{ fieldErrors['taskEndDate'] }}</span>
         }
@@ -72,7 +80,12 @@
         Dates of Task/Event (1-31, comma-separated)
         <input
           type="text"
-          [(ngModel)]="newTaskFixedDatesText"
+          inputmode="numeric"
+          pattern="[0-9, ]*"
+          [ngModel]="newTaskFixedDatesText"
+          (beforeinput)="onFixedDatesBeforeInput($event)"
+          (ngModelChange)="onFixedDatesTextChange($event)"
+          [class.input-invalid]="fieldErrors['fixedDates']"
           placeholder="Example: 8, 21" />
         @if (fieldErrors['fixedDates']) {
         <span class="field-error">{{ fieldErrors['fixedDates'] }}</span>
