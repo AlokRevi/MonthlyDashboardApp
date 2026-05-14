@@ -53,27 +53,32 @@
       <div class="occurrence-grid-wrap">
         <div class="occurrence-grid">
           @for (day of dayStrip; track trackByDay($index, day)) {
+          @let occurrence = getOccurrenceForDay(task, day);
+
           <div
-            class="day-cell"
+            class="day-cell occurrence-grid-cell"
             [ngClass]="getPastCellClass(day)"
             [class.saturday]="day.weekday === 'SATURDAY'"
             [class.sunday]="day.weekday === 'SUNDAY'"
-            [class.wednesday]="day.weekday === 'WEDNESDAY'">
-            @let occurrence = getOccurrenceForDay(task, day);
+            [class.wednesday]="day.weekday === 'WEDNESDAY'"
+            [class.occurrence-grid-cell-completed]="isOccurrenceCompleted(occurrence)">
 
             @if (occurrence) {
-            <button
-              type="button"
-              class="occurrence-pill"
-              [class.completed]="occurrence.status === 'COMPLETED'"
+            <span
+              class="occurrence-pill occurrence-cell-marker"
+              [class.completed]="isOccurrenceCompleted(occurrence)"
+              [class.completed-occurrence]="isOccurrenceCompleted(occurrence)"
               [class.overdue]="occurrence.status === 'OVERDUE'"
               [class.due-today]="occurrence.status === 'DUE_TODAY'"
               [class.upcoming]="occurrence.status === 'UPCOMING'"
               [class.past-occurrence]="isPastDay(day)"
-              (click)="onOccurrenceClicked(task, occurrence); $event.stopPropagation()"
               [title]="occurrence.status + ' - ' + occurrence.occurrenceDate">
-              {{ occurrence.dayOfMonth }}
-            </button>
+              <span class="occurrence-day-number">{{ occurrence.dayOfMonth }}</span>
+
+              @if (isOccurrenceCompleted(occurrence)) {
+              <span class="occurrence-completed-tick" aria-hidden="true">✓</span>
+              }
+            </span>
             }
           </div>
           }

@@ -102,8 +102,6 @@
         <app-category-section
           [categories]="state.visibleDashboardCategories()"
           [dayStrip]="dashboard.dayStrip"
-          (markComplete)="state.markComplete($event)"
-          (undoComplete)="state.undoComplete($event)"
           (deleteTask)="state.deleteTask($event)"
           (editTask)="state.openEditTaskModal($event)"
           (editCategory)="state.openCategoryEditDialog($event)">

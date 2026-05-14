@@ -27,8 +27,6 @@ export class CategorySectionComponent {
   @Input() categories: DashboardCategory[] = [];
   @Input() dayStrip: DayStripItem[] = [];
 
-  @Output() markComplete = new EventEmitter<{ taskId: number; occurrenceDate: string }>();
-  @Output() undoComplete = new EventEmitter<{ taskId: number; occurrenceDate: string }>();
   @Output() deleteTask = new EventEmitter<number>();
   @Output() editTask = new EventEmitter<{ taskId: number; occurrenceDate: string | null }>();
   @Output() editCategory = new EventEmitter<number>();
@@ -94,19 +92,8 @@ export class CategorySectionComponent {
     return this.getDaysPast(day) > 0;
   }
 
-  onOccurrenceClicked(task: DashboardTask, occurrence: DashboardOccurrence): void {
-    if (occurrence.completed) {
-      this.undoComplete.emit({
-        taskId: task.taskId,
-        occurrenceDate: occurrence.occurrenceDate
-      });
-      return;
-    }
-
-    this.markComplete.emit({
-      taskId: task.taskId,
-      occurrenceDate: occurrence.occurrenceDate
-    });
+  isOccurrenceCompleted(occurrence: DashboardOccurrence | null): boolean {
+    return occurrence?.completed === true || occurrence?.status === 'COMPLETED';
   }
 
   onEditTaskClicked(task: DashboardTask): void {
