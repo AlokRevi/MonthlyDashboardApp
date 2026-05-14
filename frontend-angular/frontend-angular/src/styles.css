@@ -90,6 +90,13 @@
   --category-fallback-color: #94a3b8;
 }
 
+.theme-solar-punk,
+.theme-cyberpunk,
+.theme-space-sci-fi,
+.theme-matrix-coder {
+  /* Theme preset hooks. These intentionally inherit default tokens for now. */
+}
+
 html,
 body {
   margin: 0;
