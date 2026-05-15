@@ -1,5 +1,5 @@
 import { computed, Injectable, signal } from '@angular/core';
-import { forkJoin } from 'rxjs';
+import { catchError, forkJoin, of } from 'rxjs';
 
 import {
   CategoryResponse,
@@ -13,6 +13,7 @@ import {
   UpdateTaskRequest,
   ScaleNumbering,
   StartOfWeek,
+  TimelineDashboardResponse,
   TimelineView,
   ViewSettings
 } from '../../models/dashboard.models';
@@ -31,6 +32,7 @@ export class DashboardPageStateService {
   });
 
   dashboard = signal<MonthlyDashboardResponse | null>(null);
+  monthTimelineDashboard = signal<TimelineDashboardResponse | null>(null);
   checklist = signal<TodayChecklistResponse | null>(null);
   availableCategories = signal<CategoryResponse[]>([]);
 
@@ -79,11 +81,15 @@ export class DashboardPageStateService {
 
     forkJoin({
       dashboard: this.dashboardApi.getMonthlyDashboard(this.selectedYear(), this.selectedMonth()),
+      monthTimelineDashboard: this.dashboardApi.getMonthTimelineDashboard().pipe(
+        catchError(() => of(null))
+      ),
       checklist: this.dashboardApi.getTodayChecklist(),
       categories: this.dashboardApi.getCategories()
     }).subscribe({
-      next: ({ dashboard, checklist, categories }) => {
+      next: ({ dashboard, monthTimelineDashboard, checklist, categories }) => {
         this.dashboard.set(dashboard);
+        this.monthTimelineDashboard.set(monthTimelineDashboard);
         this.checklist.set(checklist);
         this.availableCategories.set(categories);
         this.loading.set(false);

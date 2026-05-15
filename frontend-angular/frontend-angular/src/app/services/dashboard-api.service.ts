@@ -15,7 +15,8 @@ import {
   TaskResponse,
   SetupImportPreviewResponse,
   SetupImportResultResponse,
-  SetupSnapshotResponse
+  SetupSnapshotResponse,
+  TimelineDashboardResponse
 } from '../models/dashboard.models';
 
 @Injectable({
@@ -29,6 +30,12 @@ export class DashboardApiService {
   getMonthlyDashboard(year: number, month: number): Observable<MonthlyDashboardResponse> {
     return this.http.get<MonthlyDashboardResponse>(
       `${this.apiBase}/dashboard/monthly?year=${year}&month=${month}`
+    );
+  }
+
+  getMonthTimelineDashboard(): Observable<TimelineDashboardResponse> {
+    return this.http.get<TimelineDashboardResponse>(
+      `${this.apiBase}/dashboard/timeline?view=MONTH`
     );
   }
 

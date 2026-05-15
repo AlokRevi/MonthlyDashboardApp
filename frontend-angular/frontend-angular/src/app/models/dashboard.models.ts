@@ -14,6 +14,7 @@ export interface MonthlyDashboardResponse {
 }
 
 export type TimelineView = 'MONTH' | 'QUARTER' | 'QUADRIMESTER' | 'HALF_YEAR' | 'YEAR';
+export type TimelineCellType = 'DAY' | 'WEEKDAY_BUCKET' | 'WEEKEND_BUCKET' | 'WEEK';
 export type StartOfWeek = 'SUNDAY' | 'MONDAY';
 export type ScaleNumbering = 'SEGMENT' | 'CONTINUED';
 
@@ -22,6 +23,78 @@ export interface ViewSettings {
   startOfWeek: StartOfWeek;
   scaleNumbering: ScaleNumbering;
   calendarYearBound: boolean;
+}
+
+export interface TimelineDashboardResponse {
+  view: TimelineView;
+  year: number;
+  month: number;
+  startDate: string;
+  endDate: string;
+  label: string;
+  today: string;
+  readOnly: boolean;
+  settings: TimelineSettingsResponse;
+  scaleBar: TimelineScaleBarResponse;
+  cells: TimelineCellResponse[];
+  categories: TimelineCategoryResponse[];
+}
+
+export interface TimelineSettingsResponse {
+  view: TimelineView;
+  startOfWeek: StartOfWeek;
+  scaleNumbering: ScaleNumbering;
+  calendarYearBound: boolean;
+}
+
+export interface TimelineScaleBarResponse {
+  anchorCellKeys: string[];
+  currentDateLabel: string;
+}
+
+export interface TimelineCellResponse {
+  key: string;
+  startDate: string;
+  endDate: string;
+  label: string;
+  secondaryLabel: string;
+  cellType: TimelineCellType;
+  segmentIndex: number;
+  continuedIndex: number;
+  isToday: boolean;
+  isWeekend: boolean;
+  isCurrentPeriod: boolean;
+}
+
+export interface TimelineCategoryResponse {
+  categoryId: number;
+  categoryName: string;
+  categoryColor: string;
+  tasks: TimelineTaskResponse[];
+}
+
+export interface TimelineTaskResponse {
+  taskId: number;
+  taskName: string;
+  recurrenceType: RecurrenceType;
+  recurrenceSummary: string;
+  buckets: TimelineOccurrenceBucketResponse[];
+}
+
+export interface TimelineOccurrenceBucketResponse {
+  cellKey: string;
+  totalOccurrences: number;
+  completedOccurrences: number;
+  completionLabel: string;
+  collapsedLabel: string;
+  occurrences: TimelineOccurrenceResponse[];
+}
+
+export interface TimelineOccurrenceResponse {
+  occurrenceDate: string;
+  completed: boolean;
+  completionDate: string | null;
+  status: 'UPCOMING' | 'DUE_TODAY' | 'OVERDUE' | 'COMPLETED';
 }
 
 export interface ScaleBar {
