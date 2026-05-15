@@ -34,8 +34,10 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 @Service
 public class DashboardServiceImpl implements DashboardService {
@@ -85,11 +87,16 @@ public class DashboardServiceImpl implements DashboardService {
             ScaleNumbering scaleNumbering,
             boolean calendarYearBound
     ) {
-        if (view != TimelineView.MONTH) {
+        if (view != TimelineView.MONTH && view != TimelineView.QUARTER) {
             throw new ValidationException("Timeline view " + view + " is not supported yet");
         }
 
         LocalDate today = appDateProvider.today();
+
+        if (view == TimelineView.QUARTER) {
+            return getQuarterTimelineDashboard(today, startOfWeek, scaleNumbering, calendarYearBound);
+        }
+
         YearMonth currentMonth = YearMonth.from(today);
         LocalDate startDate = currentMonth.atDay(1);
         LocalDate endDate = currentMonth.atEndOfMonth();
@@ -115,6 +122,43 @@ public class DashboardServiceImpl implements DashboardService {
                 buildTimelineScaleBar(currentMonth, today),
                 cells,
                 buildTimelineCategoryResponses(currentMonth, cells)
+        );
+    }
+
+    private TimelineDashboardResponse getQuarterTimelineDashboard(
+            LocalDate today,
+            StartOfWeek startOfWeek,
+            ScaleNumbering scaleNumbering,
+            boolean calendarYearBound
+    ) {
+        TimelineDateRange dateRange = buildQuarterDateRange(today, calendarYearBound);
+        List<TimelineCellResponse> cells = buildQuarterBucketCells(
+                dateRange.startDate(),
+                dateRange.endDate(),
+                today,
+                startOfWeek
+        );
+
+        TimelineSettingsResponse settings = new TimelineSettingsResponse(
+                TimelineView.QUARTER,
+                startOfWeek,
+                scaleNumbering,
+                calendarYearBound
+        );
+
+        return new TimelineDashboardResponse(
+                TimelineView.QUARTER,
+                dateRange.startDate().getYear(),
+                dateRange.startDate().getMonthValue(),
+                dateRange.startDate(),
+                dateRange.endDate(),
+                dateRange.label(),
+                today,
+                false,
+                settings,
+                buildTimelineScaleBar(dateRange.startDate(), dateRange.endDate(), cells, today),
+                cells,
+                buildTimelineCategoryResponses(dateRange.startDate(), dateRange.endDate(), cells)
         );
     }
 
@@ -199,6 +243,49 @@ public class DashboardServiceImpl implements DashboardService {
         return results;
     }
 
+    private List<TimelineCategoryResponse> buildTimelineCategoryResponses(
+            LocalDate startDate,
+            LocalDate endDate,
+            List<TimelineCellResponse> cells
+    ) {
+        List<Category> categories = categoryRepository.findAllByOrderByNameAsc();
+        List<TimelineCategoryResponse> results = new ArrayList<>();
+
+        for (Category category : categories) {
+            List<Task> tasks = taskRepository.findByCategoryIdAndIsActiveOrderByNameAsc(
+                    category.getId(),
+                    true
+            );
+
+            List<TimelineTaskResponse> taskResponses = new ArrayList<>();
+
+            for (Task task : tasks) {
+                List<OccurrenceResponse> occurrences = recurrenceService.generateOccurrencesBetween(
+                        task,
+                        startDate,
+                        endDate
+                );
+
+                taskResponses.add(new TimelineTaskResponse(
+                        task.getId(),
+                        task.getName(),
+                        task.getRecurrenceType(),
+                        RecurrenceSummaryHelper.summarize(task),
+                        buildTimelineOccurrenceBuckets(cells, occurrences)
+                ));
+            }
+
+            results.add(new TimelineCategoryResponse(
+                    category.getId(),
+                    category.getName(),
+                    category.getColor(),
+                    taskResponses
+            ));
+        }
+
+        return results;
+    }
+
     private List<TimelineOccurrenceBucketResponse> buildTimelineOccurrenceBuckets(
             List<TimelineCellResponse> cells,
             List<OccurrenceResponse> occurrences
@@ -207,8 +294,7 @@ public class DashboardServiceImpl implements DashboardService {
 
         for (TimelineCellResponse cell : cells) {
             List<TimelineOccurrenceResponse> bucketOccurrences = occurrences.stream()
-                    .filter(occurrence -> !occurrence.occurrenceDate().isBefore(cell.startDate())
-                            && !occurrence.occurrenceDate().isAfter(cell.endDate()))
+                    .filter(occurrence -> occurrenceBelongsInCell(occurrence.occurrenceDate(), cell))
                     .map(this::toTimelineOccurrence)
                     .toList();
 
@@ -228,6 +314,22 @@ public class DashboardServiceImpl implements DashboardService {
         }
 
         return buckets;
+    }
+
+    private boolean occurrenceBelongsInCell(LocalDate occurrenceDate, TimelineCellResponse cell) {
+        if (occurrenceDate.isBefore(cell.startDate()) || occurrenceDate.isAfter(cell.endDate())) {
+            return false;
+        }
+
+        if (cell.cellType() == TimelineCellType.WEEKDAY_BUCKET) {
+            return !isWeekend(occurrenceDate.getDayOfWeek());
+        }
+
+        if (cell.cellType() == TimelineCellType.WEEKEND_BUCKET) {
+            return isWeekend(occurrenceDate.getDayOfWeek());
+        }
+
+        return true;
     }
 
     private TimelineOccurrenceResponse toTimelineOccurrence(OccurrenceResponse occurrence) {
@@ -274,6 +376,35 @@ public class DashboardServiceImpl implements DashboardService {
         return new TimelineScaleBarResponse(anchorCellKeys, currentDateLabel);
     }
 
+    private TimelineScaleBarResponse buildTimelineScaleBar(
+            LocalDate startDate,
+            LocalDate endDate,
+            List<TimelineCellResponse> cells,
+            LocalDate today
+    ) {
+        Set<String> anchorCellKeys = new LinkedHashSet<>();
+        YearMonth cursor = YearMonth.from(startDate);
+        YearMonth finalMonth = YearMonth.from(endDate);
+
+        while (!cursor.isAfter(finalMonth)) {
+            LocalDate monthStart = cursor.atDay(1).isBefore(startDate)
+                    ? startDate
+                    : cursor.atDay(1);
+            cells.stream()
+                    .filter(cell -> occurrenceBelongsInCell(monthStart, cell))
+                    .findFirst()
+                    .map(TimelineCellResponse::key)
+                    .ifPresent(anchorCellKeys::add);
+            cursor = cursor.plusMonths(1);
+        }
+
+        String currentDateLabel = today.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
+                + " "
+                + today.getDayOfMonth();
+
+        return new TimelineScaleBarResponse(List.copyOf(anchorCellKeys), currentDateLabel);
+    }
+
     private List<TimelineCellResponse> buildTimelineDayCells(YearMonth targetMonth, LocalDate today) {
         List<TimelineCellResponse> cells = new ArrayList<>();
 
@@ -297,6 +428,91 @@ public class DashboardServiceImpl implements DashboardService {
         }
 
         return cells;
+    }
+
+    private List<TimelineCellResponse> buildQuarterBucketCells(
+            LocalDate startDate,
+            LocalDate endDate,
+            LocalDate today,
+            StartOfWeek startOfWeek
+    ) {
+        List<TimelineCellResponse> cells = new ArrayList<>();
+        LocalDate weekStart = alignToWeekStart(startDate, startOfWeek);
+        int weekIndex = 1;
+        int continuedIndex = 1;
+
+        while (!weekStart.isAfter(endDate)) {
+            LocalDate weekEnd = weekStart.plusDays(6);
+            LocalDate cellStart = weekStart.isBefore(startDate) ? startDate : weekStart;
+            LocalDate cellEnd = weekEnd.isAfter(endDate) ? endDate : weekEnd;
+
+            cells.add(new TimelineCellResponse(
+                    bucketCellKey(weekStart, TimelineCellType.WEEKDAY_BUCKET),
+                    cellStart,
+                    cellEnd,
+                    "W" + weekIndex,
+                    "Weekdays",
+                    TimelineCellType.WEEKDAY_BUCKET,
+                    weekIndex,
+                    continuedIndex++,
+                    containsToday(cellStart, cellEnd, today, TimelineCellType.WEEKDAY_BUCKET),
+                    false,
+                    true
+            ));
+
+            cells.add(new TimelineCellResponse(
+                    bucketCellKey(weekStart, TimelineCellType.WEEKEND_BUCKET),
+                    cellStart,
+                    cellEnd,
+                    "W" + weekIndex,
+                    "Weekend",
+                    TimelineCellType.WEEKEND_BUCKET,
+                    weekIndex,
+                    continuedIndex++,
+                    containsToday(cellStart, cellEnd, today, TimelineCellType.WEEKEND_BUCKET),
+                    true,
+                    true
+            ));
+
+            weekStart = weekStart.plusWeeks(1);
+            weekIndex++;
+        }
+
+        return cells;
+    }
+
+    private LocalDate alignToWeekStart(LocalDate date, StartOfWeek startOfWeek) {
+        DayOfWeek targetDayOfWeek = startOfWeek == StartOfWeek.SUNDAY
+                ? DayOfWeek.SUNDAY
+                : DayOfWeek.MONDAY;
+        LocalDate cursor = date;
+
+        while (cursor.getDayOfWeek() != targetDayOfWeek) {
+            cursor = cursor.minusDays(1);
+        }
+
+        return cursor;
+    }
+
+    private boolean containsToday(
+            LocalDate startDate,
+            LocalDate endDate,
+            LocalDate today,
+            TimelineCellType cellType
+    ) {
+        return occurrenceBelongsInCell(today, new TimelineCellResponse(
+                "",
+                startDate,
+                endDate,
+                "",
+                "",
+                cellType,
+                0,
+                0,
+                false,
+                false,
+                true
+        ));
     }
 
     private List<DayStripItemResponse> buildDayStrip(YearMonth targetMonth, LocalDate today) {
@@ -328,7 +544,52 @@ public class DashboardServiceImpl implements DashboardService {
                 + targetMonth.getYear();
     }
 
+    private TimelineDateRange buildQuarterDateRange(LocalDate today, boolean calendarYearBound) {
+        YearMonth currentMonth = YearMonth.from(today);
+
+        if (!calendarYearBound) {
+            YearMonth endMonth = currentMonth.plusMonths(2);
+            return new TimelineDateRange(
+                    currentMonth.atDay(1),
+                    endMonth.atEndOfMonth(),
+                    buildRangeLabel(currentMonth, endMonth)
+            );
+        }
+
+        int quarterStartMonth = ((today.getMonthValue() - 1) / 3) * 3 + 1;
+        YearMonth startMonth = YearMonth.of(today.getYear(), quarterStartMonth);
+        YearMonth endMonth = startMonth.plusMonths(2);
+
+        return new TimelineDateRange(
+                startMonth.atDay(1),
+                endMonth.atEndOfMonth(),
+                "Q" + (((quarterStartMonth - 1) / 3) + 1) + " " + today.getYear()
+        );
+    }
+
+    private String buildRangeLabel(YearMonth startMonth, YearMonth endMonth) {
+        String startLabel = startMonth.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
+        String endLabel = endMonth.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
+
+        if (startMonth.getYear() == endMonth.getYear()) {
+            return startLabel + "-" + endLabel + " " + startMonth.getYear();
+        }
+
+        return startLabel + " " + startMonth.getYear() + "-" + endLabel + " " + endMonth.getYear();
+    }
+
     private String cellKey(LocalDate date) {
         return date.toString();
+    }
+
+    private String bucketCellKey(LocalDate weekStart, TimelineCellType cellType) {
+        return weekStart + "-" + cellType;
+    }
+
+    private record TimelineDateRange(
+            LocalDate startDate,
+            LocalDate endDate,
+            String label
+    ) {
     }
 }

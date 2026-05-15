@@ -81,6 +81,14 @@ class DashboardTimelineIntegrationTest {
         dueToday.setDayOfMonth(15);
         task.addFixedDate(dueToday);
 
+        TaskFixedDate sameWeekWeekday = new TaskFixedDate();
+        sameWeekWeekday.setDayOfMonth(13);
+        task.addFixedDate(sameWeekWeekday);
+
+        TaskFixedDate sameWeekWeekend = new TaskFixedDate();
+        sameWeekWeekend.setDayOfMonth(16);
+        task.addFixedDate(sameWeekWeekend);
+
         TaskFixedDate upcoming = new TaskFixedDate();
         upcoming.setDayOfMonth(20);
         task.addFixedDate(upcoming);
@@ -170,5 +178,90 @@ class DashboardTimelineIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("BUSINESS_VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.message").value("Timeline view YEAR is not supported yet"));
+    }
+
+    @Test
+    void quarterWithCalendarYearBoundReturnsCurrentCalendarQuarter() throws Exception {
+        mockMvc.perform(get("/api/v1/dashboard/timeline")
+                        .param("view", "QUARTER")
+                        .param("calendarYearBound", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.view").value("QUARTER"))
+                .andExpect(jsonPath("$.year").value(2026))
+                .andExpect(jsonPath("$.month").value(4))
+                .andExpect(jsonPath("$.startDate").value("2026-04-01"))
+                .andExpect(jsonPath("$.endDate").value("2026-06-30"))
+                .andExpect(jsonPath("$.label").value("Q2 2026"))
+                .andExpect(jsonPath("$.settings.calendarYearBound").value(true));
+    }
+
+    @Test
+    void quarterWithoutCalendarYearBoundReturnsRollingThreeMonthRange() throws Exception {
+        mockMvc.perform(get("/api/v1/dashboard/timeline")
+                        .param("view", "QUARTER")
+                        .param("calendarYearBound", "false"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.view").value("QUARTER"))
+                .andExpect(jsonPath("$.year").value(2026))
+                .andExpect(jsonPath("$.month").value(5))
+                .andExpect(jsonPath("$.startDate").value("2026-05-01"))
+                .andExpect(jsonPath("$.endDate").value("2026-07-31"))
+                .andExpect(jsonPath("$.label").value("May-Jul 2026"))
+                .andExpect(jsonPath("$.settings.calendarYearBound").value(false));
+    }
+
+    @Test
+    void quarterGeneratesWeekdayAndWeekendBucketsUsingSundayWeekStart() throws Exception {
+        mockMvc.perform(get("/api/v1/dashboard/timeline")
+                        .param("view", "QUARTER")
+                        .param("calendarYearBound", "true")
+                        .param("startOfWeek", "SUNDAY"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cells", hasSize(28)))
+                .andExpect(jsonPath("$.cells[0].key").value("2026-03-29-WEEKDAY_BUCKET"))
+                .andExpect(jsonPath("$.cells[0].startDate").value("2026-04-01"))
+                .andExpect(jsonPath("$.cells[0].endDate").value("2026-04-04"))
+                .andExpect(jsonPath("$.cells[0].cellType").value("WEEKDAY_BUCKET"))
+                .andExpect(jsonPath("$.cells[1].key").value("2026-03-29-WEEKEND_BUCKET"))
+                .andExpect(jsonPath("$.cells[1].cellType").value("WEEKEND_BUCKET"));
+    }
+
+    @Test
+    void quarterHonoursMondayWeekStartWhenGeneratingBuckets() throws Exception {
+        mockMvc.perform(get("/api/v1/dashboard/timeline")
+                        .param("view", "QUARTER")
+                        .param("calendarYearBound", "true")
+                        .param("startOfWeek", "MONDAY"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cells", hasSize(28)))
+                .andExpect(jsonPath("$.cells[0].key").value("2026-03-30-WEEKDAY_BUCKET"))
+                .andExpect(jsonPath("$.cells[0].startDate").value("2026-04-01"))
+                .andExpect(jsonPath("$.cells[0].endDate").value("2026-04-05"))
+                .andExpect(jsonPath("$.cells[0].cellType").value("WEEKDAY_BUCKET"))
+                .andExpect(jsonPath("$.cells[1].key").value("2026-03-30-WEEKEND_BUCKET"))
+                .andExpect(jsonPath("$.cells[1].cellType").value("WEEKEND_BUCKET"));
+    }
+
+    @Test
+    void quarterMapsOccurrencesIntoWeekdayAndWeekendBuckets() throws Exception {
+        mockMvc.perform(get("/api/v1/dashboard/timeline")
+                        .param("view", "QUARTER")
+                        .param("calendarYearBound", "false")
+                        .param("startOfWeek", "SUNDAY"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[4].cellKey")
+                        .value("2026-05-10-WEEKDAY_BUCKET"))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[4].totalOccurrences").value(2))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[4].completedOccurrences").value(1))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[4].completionLabel").value("1/2"))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[4].collapsedLabel").value("x2"))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[4].occurrences", hasSize(2)))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[5].cellKey")
+                        .value("2026-05-10-WEEKEND_BUCKET"))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[5].totalOccurrences").value(1))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[5].completedOccurrences").value(0))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[5].completionLabel").value("0/1"))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[5].collapsedLabel").value("x1"))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[5].occurrences", hasSize(1)));
     }
 }
