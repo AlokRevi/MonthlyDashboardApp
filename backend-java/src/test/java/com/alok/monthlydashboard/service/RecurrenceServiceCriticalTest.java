@@ -279,6 +279,104 @@ class RecurrenceServiceCriticalTest {
     }
 
     @Test
+    void fixedDateRecurrenceWorksAcrossCustomDateRange() {
+        Task task = fixedDateTask(118L, LocalDate.of(2026, 1, 1), true, 10, 20);
+        when(taskRepository.findById(118L)).thenReturn(Optional.of(task));
+
+        assertThat(recurrenceService.generateOccurrenceDatesBetween(
+                118L,
+                LocalDate.of(2026, 3, 15),
+                LocalDate.of(2026, 4, 15)
+        )).containsExactly(
+                LocalDate.of(2026, 3, 20),
+                LocalDate.of(2026, 4, 10)
+        );
+    }
+
+    @Test
+    void intervalRecurrenceWorksAcrossCustomDateRange() {
+        Task task = intervalTask(119L, LocalDate.of(2025, 12, 29), 3);
+        when(taskRepository.findById(119L)).thenReturn(Optional.of(task));
+
+        assertThat(recurrenceService.generateOccurrenceDatesBetween(
+                119L,
+                LocalDate.of(2026, 1, 5),
+                LocalDate.of(2026, 1, 12)
+        )).containsExactly(
+                LocalDate.of(2026, 1, 7),
+                LocalDate.of(2026, 1, 10)
+        );
+    }
+
+    @Test
+    void weekdayRecurrenceWorksAcrossCustomDateRange() {
+        Task task = weekdayTask(
+                120L,
+                LocalDate.of(2026, 1, 1),
+                com.alok.monthlydashboard.entity.enums.Weekday.MONDAY,
+                com.alok.monthlydashboard.entity.enums.WeekOfMonth.FIRST
+        );
+        when(taskRepository.findById(120L)).thenReturn(Optional.of(task));
+
+        assertThat(recurrenceService.generateOccurrenceDatesBetween(
+                120L,
+                LocalDate.of(2026, 3, 1),
+                LocalDate.of(2026, 4, 30)
+        )).containsExactly(
+                LocalDate.of(2026, 3, 2),
+                LocalDate.of(2026, 4, 6)
+        );
+    }
+
+    @Test
+    void customDateRangeCanCrossMonthBoundaryAndPreserveFallbackRules() {
+        Task task = fixedDateTask(121L, LocalDate.of(2026, 1, 1), true, 31);
+        when(taskRepository.findById(121L)).thenReturn(Optional.of(task));
+
+        assertThat(recurrenceService.generateOccurrenceDatesBetween(
+                121L,
+                LocalDate.of(2026, 1, 15),
+                LocalDate.of(2026, 2, 28)
+        )).containsExactly(
+                LocalDate.of(2026, 1, 31),
+                LocalDate.of(2026, 2, 28)
+        );
+    }
+
+    @Test
+    void customDateRangeCanCrossYearBoundary() {
+        Task task = fixedDateTask(122L, LocalDate.of(2025, 1, 1), true, 31);
+        when(taskRepository.findById(122L)).thenReturn(Optional.of(task));
+
+        assertThat(recurrenceService.generateOccurrenceDatesBetween(
+                122L,
+                LocalDate.of(2025, 12, 15),
+                LocalDate.of(2026, 1, 31)
+        )).containsExactly(
+                LocalDate.of(2025, 12, 31),
+                LocalDate.of(2026, 1, 31)
+        );
+    }
+
+    @Test
+    void monthWrapperOutputMatchesEquivalentFullMonthDateRange() {
+        Task task = fixedDateTask(123L, LocalDate.of(2026, 1, 1), true, 10, 20, 31);
+        when(taskRepository.findById(123L)).thenReturn(Optional.of(task));
+
+        assertThat(recurrenceService.generateOccurrenceDatesForMonth(123L, 2026, 4))
+                .containsExactlyElementsOf(recurrenceService.generateOccurrenceDatesBetween(
+                        123L,
+                        LocalDate.of(2026, 4, 1),
+                        LocalDate.of(2026, 4, 30)
+                ))
+                .containsExactly(
+                        LocalDate.of(2026, 4, 10),
+                        LocalDate.of(2026, 4, 20),
+                        LocalDate.of(2026, 4, 30)
+                );
+    }
+
+    @Test
     void pastIncompleteOccurrenceIsMarkedOverdue() {
         LocalDate yesterday = LocalDate.of(2026, 4, 27);
         Task task = fixedDateTask(102L, yesterday, true, yesterday.getDayOfMonth());

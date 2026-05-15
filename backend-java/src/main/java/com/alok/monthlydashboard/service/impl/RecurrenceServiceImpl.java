@@ -46,14 +46,35 @@ public class RecurrenceServiceImpl implements RecurrenceService {
     public List<OccurrenceResponse> generateOccurrencesForMonth(Long taskId, int year, int month) {
         Task task = getTaskOrThrow(taskId);
         YearMonth targetMonth = YearMonth.of(year, month);
+        return generateOccurrencesBetween(
+                task,
+                targetMonth.atDay(1),
+                targetMonth.atEndOfMonth()
+        );
+    }
+
+    @Override
+    public List<OccurrenceResponse> generateOccurrencesBetween(
+            Long taskId,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        return generateOccurrencesBetween(getTaskOrThrow(taskId), startDate, endDate);
+    }
+
+    @Override
+    public List<OccurrenceResponse> generateOccurrencesBetween(
+            Task task,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
         LocalDate today = appDateProvider.today();
-
-        List<LocalDate> occurrenceDates = generateOccurrenceDates(task, targetMonth);
-
+        List<LocalDate> occurrenceDates = generateOccurrenceDatesBetween(task, startDate, endDate);
         List<OccurrenceResponse> responses = new ArrayList<>();
+
         for (LocalDate occurrenceDate : occurrenceDates) {
             Optional<TaskCompletion> completionOpt =
-                    taskCompletionRepository.findByTaskIdAndOccurrenceDate(taskId, occurrenceDate);
+                    taskCompletionRepository.findByTaskIdAndOccurrenceDate(task.getId(), occurrenceDate);
 
             boolean completed = completionOpt.isPresent();
             LocalDate completionDate = completionOpt.map(TaskCompletion::getCompletionDate).orElse(null);
@@ -76,7 +97,47 @@ public class RecurrenceServiceImpl implements RecurrenceService {
     @Override
     public List<LocalDate> generateOccurrenceDatesForMonth(Long taskId, int year, int month) {
         Task task = getTaskOrThrow(taskId);
-        return generateOccurrenceDates(task, YearMonth.of(year, month));
+        YearMonth targetMonth = YearMonth.of(year, month);
+        return generateOccurrenceDatesBetween(
+                task,
+                targetMonth.atDay(1),
+                targetMonth.atEndOfMonth()
+        );
+    }
+
+    @Override
+    public List<LocalDate> generateOccurrenceDatesBetween(
+            Long taskId,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        return generateOccurrenceDatesBetween(getTaskOrThrow(taskId), startDate, endDate);
+    }
+
+    @Override
+    public List<LocalDate> generateOccurrenceDatesBetween(
+            Task task,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        if (startDate.isAfter(endDate)) {
+            return List.of();
+        }
+
+        List<LocalDate> dates = new ArrayList<>();
+        YearMonth cursor = YearMonth.from(startDate);
+        YearMonth finalMonth = YearMonth.from(endDate);
+
+        while (!cursor.isAfter(finalMonth)) {
+            dates.addAll(generateOccurrenceDates(task, cursor)
+                    .stream()
+                    .filter(date -> !date.isBefore(startDate) && !date.isAfter(endDate))
+                    .toList());
+            cursor = cursor.plusMonths(1);
+        }
+
+        dates.sort(LocalDate::compareTo);
+        return dates;
     }
 
     @Override
