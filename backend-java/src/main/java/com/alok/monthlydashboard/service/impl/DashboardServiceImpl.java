@@ -87,11 +87,17 @@ public class DashboardServiceImpl implements DashboardService {
             ScaleNumbering scaleNumbering,
             boolean calendarYearBound
     ) {
-        if (view != TimelineView.MONTH && view != TimelineView.QUARTER) {
+        if (view != TimelineView.MONTH
+                && view != TimelineView.QUARTER
+                && view != TimelineView.QUADRIMESTER) {
             throw new ValidationException("Timeline view " + view + " is not supported yet");
         }
 
         LocalDate today = appDateProvider.today();
+
+        if (view == TimelineView.QUADRIMESTER) {
+            return getQuadrimesterTimelineDashboard(today, startOfWeek, scaleNumbering, calendarYearBound);
+        }
 
         if (view == TimelineView.QUARTER) {
             return getQuarterTimelineDashboard(today, startOfWeek, scaleNumbering, calendarYearBound);
@@ -132,7 +138,7 @@ public class DashboardServiceImpl implements DashboardService {
             boolean calendarYearBound
     ) {
         TimelineDateRange dateRange = buildQuarterDateRange(today, calendarYearBound);
-        List<TimelineCellResponse> cells = buildQuarterBucketCells(
+        List<TimelineCellResponse> cells = buildWeekBucketCells(
                 dateRange.startDate(),
                 dateRange.endDate(),
                 today,
@@ -148,6 +154,43 @@ public class DashboardServiceImpl implements DashboardService {
 
         return new TimelineDashboardResponse(
                 TimelineView.QUARTER,
+                dateRange.startDate().getYear(),
+                dateRange.startDate().getMonthValue(),
+                dateRange.startDate(),
+                dateRange.endDate(),
+                dateRange.label(),
+                today,
+                false,
+                settings,
+                buildTimelineScaleBar(dateRange.startDate(), dateRange.endDate(), cells, today),
+                cells,
+                buildTimelineCategoryResponses(dateRange.startDate(), dateRange.endDate(), cells)
+        );
+    }
+
+    private TimelineDashboardResponse getQuadrimesterTimelineDashboard(
+            LocalDate today,
+            StartOfWeek startOfWeek,
+            ScaleNumbering scaleNumbering,
+            boolean calendarYearBound
+    ) {
+        TimelineDateRange dateRange = buildQuadrimesterDateRange(today, calendarYearBound);
+        List<TimelineCellResponse> cells = buildWeekBucketCells(
+                dateRange.startDate(),
+                dateRange.endDate(),
+                today,
+                startOfWeek
+        );
+
+        TimelineSettingsResponse settings = new TimelineSettingsResponse(
+                TimelineView.QUADRIMESTER,
+                startOfWeek,
+                scaleNumbering,
+                calendarYearBound
+        );
+
+        return new TimelineDashboardResponse(
+                TimelineView.QUADRIMESTER,
                 dateRange.startDate().getYear(),
                 dateRange.startDate().getMonthValue(),
                 dateRange.startDate(),
@@ -430,7 +473,7 @@ public class DashboardServiceImpl implements DashboardService {
         return cells;
     }
 
-    private List<TimelineCellResponse> buildQuarterBucketCells(
+    private List<TimelineCellResponse> buildWeekBucketCells(
             LocalDate startDate,
             LocalDate endDate,
             LocalDate today,
@@ -564,6 +607,29 @@ public class DashboardServiceImpl implements DashboardService {
                 startMonth.atDay(1),
                 endMonth.atEndOfMonth(),
                 "Q" + (((quarterStartMonth - 1) / 3) + 1) + " " + today.getYear()
+        );
+    }
+
+    private TimelineDateRange buildQuadrimesterDateRange(LocalDate today, boolean calendarYearBound) {
+        YearMonth currentMonth = YearMonth.from(today);
+
+        if (!calendarYearBound) {
+            YearMonth endMonth = currentMonth.plusMonths(3);
+            return new TimelineDateRange(
+                    currentMonth.atDay(1),
+                    endMonth.atEndOfMonth(),
+                    buildRangeLabel(currentMonth, endMonth)
+            );
+        }
+
+        int quadrimesterStartMonth = ((today.getMonthValue() - 1) / 4) * 4 + 1;
+        YearMonth startMonth = YearMonth.of(today.getYear(), quadrimesterStartMonth);
+        YearMonth endMonth = startMonth.plusMonths(3);
+
+        return new TimelineDateRange(
+                startMonth.atDay(1),
+                endMonth.atEndOfMonth(),
+                "Quadrimester " + (((quadrimesterStartMonth - 1) / 4) + 1) + " " + today.getYear()
         );
     }
 
