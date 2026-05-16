@@ -2,10 +2,10 @@
 <div class="quarter-header">
   <div>
     <h3>{{ quarter.label }}</h3>
-    <p>{{ quarter.startDate }} to {{ quarter.endDate }}</p>
+    <p>{{ quarter.startDate }} to {{ quarter.endDate }} · generated occurrence summary</p>
   </div>
 
-  <span class="quarter-readonly-badge">Read-only</span>
+  <span class="quarter-readonly-badge">Read-only view · completion changes stay in Month</span>
 </div>
 
 @if (categories.length === 0) {
@@ -26,7 +26,7 @@
     [class.weekend]="cell.cellType === 'WEEKEND_BUCKET'"
     [title]="cell.startDate + ' to ' + cell.endDate">
     <span>{{ cell.label }}</span>
-    <small>{{ cell.secondaryLabel }}</small>
+    <small>{{ cellBucketLabel(cell) }}</small>
   </div>
   }
 
@@ -44,9 +44,15 @@
   }
 
   @for (task of category.tasks; track task.taskId) {
-  <div class="quarter-task-name">
+  <div
+    class="quarter-task-name"
+    [class.no-visible-occurrences]="!hasOccurrences(task)">
     <strong>{{ task.taskName }}</strong>
+    @if (hasOccurrences(task)) {
     <span>{{ task.recurrenceSummary }}</span>
+    } @else {
+    <span>No occurrences in this quarter</span>
+    }
   </div>
 
   @for (cell of quarter.cells; track cell.key) {
@@ -56,9 +62,11 @@
     [class.has-occurrences]="bucket.totalOccurrences > 0"
     [class.completed]="bucket.totalOccurrences > 0 && bucket.completedOccurrences === bucket.totalOccurrences"
     [class.weekend]="cell.cellType === 'WEEKEND_BUCKET'"
-    [title]="cell.startDate + ' to ' + cell.endDate">
+    [title]="bucketAccessibleLabel(bucket, cell)"
+    [attr.aria-label]="bucketAccessibleLabel(bucket, cell)">
     @if (bucket.totalOccurrences > 0) {
-    {{ bucket.completionLabel }}
+    <span class="bucket-count">{{ bucket.completionLabel }}</span>
+    <small>done</small>
     }
   </div>
   } @else {
