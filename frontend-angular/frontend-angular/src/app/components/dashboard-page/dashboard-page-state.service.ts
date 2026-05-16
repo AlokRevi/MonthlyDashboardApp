@@ -75,12 +75,6 @@ export class DashboardPageStateService {
 
   visibleQuarterCategories = computed(() =>
     this.quarterTimelineDashboard()?.categories
-      .map(category => ({
-        ...category,
-        tasks: category.tasks.filter(task =>
-          task.buckets.some(bucket => bucket.totalOccurrences > 0)
-        )
-      }))
       .filter(category => category.tasks.length > 0) ?? []
   );
 
