@@ -2,7 +2,7 @@
 <div class="halfyear-header">
   <div>
     <h3>{{ halfyear.label }}</h3>
-    <p>{{ halfyear.startDate }} to {{ halfyear.endDate }} · weekly occurrence buckets</p>
+    <p>{{ halfyear.startDate }} to {{ halfyear.endDate }} · weekly generated occurrence summary</p>
   </div>
 
   <div class="halfyear-readonly-badge">
@@ -29,6 +29,7 @@
     [title]="weekRangeLabel(cell)">
     <span>{{ cell.label }}</span>
     <small>Week</small>
+    <em>{{ weekShortRangeLabel(cell) }}</em>
   </div>
   }
 
@@ -53,7 +54,7 @@
     @if (hasOccurrences(task)) {
     <span>{{ task.recurrenceSummary }}</span>
     } @else {
-    <span>No generated occurrences in this visible HalfYear</span>
+    <span>No generated occurrences in this visible half-year</span>
     }
   </div>
 

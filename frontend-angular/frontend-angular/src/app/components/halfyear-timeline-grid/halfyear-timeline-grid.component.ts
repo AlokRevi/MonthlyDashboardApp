@@ -42,6 +42,10 @@ export class HalfyearTimelineGridComponent {
       : `${cell.startDate} to ${cell.endDate}`;
   }
 
+  weekShortRangeLabel(cell: TimelineCellResponse): string {
+    return `${this.shortDate(cell.startDate)}-${this.shortDate(cell.endDate)}`;
+  }
+
   bucketDetailLabel(bucket: TimelineOccurrenceBucketResponse): string {
     const total = bucket.totalOccurrences;
 
@@ -63,5 +67,11 @@ export class HalfyearTimelineGridComponent {
     }
 
     return `${bucket.completedOccurrences} completed of ${total} generated occurrences from ${cell.startDate} to ${cell.endDate}`;
+  }
+
+  private shortDate(date: string): string {
+    const [, month, day] = date.split('-');
+
+    return `${Number(month)}/${Number(day)}`;
   }
 }
