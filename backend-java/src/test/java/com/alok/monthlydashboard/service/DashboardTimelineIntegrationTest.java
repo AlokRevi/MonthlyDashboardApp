@@ -185,12 +185,90 @@ class DashboardTimelineIntegrationTest {
     }
 
     @Test
-    void unsupportedTimelineViewsReturnControlledValidationError() throws Exception {
+    void yearCalendarBoundReturnsCurrentCalendarYear() throws Exception {
         mockMvc.perform(get("/api/v1/dashboard/timeline")
-                        .param("view", "YEAR"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("BUSINESS_VALIDATION_ERROR"))
-                .andExpect(jsonPath("$.message").value("Timeline view YEAR is not supported yet"));
+                        .param("view", "YEAR")
+                        .param("calendarYearBound", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.view").value("YEAR"))
+                .andExpect(jsonPath("$.year").value(2026))
+                .andExpect(jsonPath("$.month").value(1))
+                .andExpect(jsonPath("$.startDate").value("2026-01-01"))
+                .andExpect(jsonPath("$.endDate").value("2026-12-31"))
+                .andExpect(jsonPath("$.label").value("2026"))
+                .andExpect(jsonPath("$.settings.calendarYearBound").value(true));
+    }
+
+    @Test
+    void yearWithoutCalendarYearBoundReturnsRollingTwelveMonthRange() throws Exception {
+        mockMvc.perform(get("/api/v1/dashboard/timeline")
+                        .param("view", "YEAR")
+                        .param("calendarYearBound", "false"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.view").value("YEAR"))
+                .andExpect(jsonPath("$.year").value(2026))
+                .andExpect(jsonPath("$.month").value(5))
+                .andExpect(jsonPath("$.startDate").value("2026-05-01"))
+                .andExpect(jsonPath("$.endDate").value("2027-04-30"))
+                .andExpect(jsonPath("$.label").value("May 2026-Apr 2027"))
+                .andExpect(jsonPath("$.settings.calendarYearBound").value(false));
+    }
+
+    @Test
+    void yearGeneratesWeekCellsUsingSundayWeekStart() throws Exception {
+        mockMvc.perform(get("/api/v1/dashboard/timeline")
+                        .param("view", "YEAR")
+                        .param("calendarYearBound", "false")
+                        .param("startOfWeek", "SUNDAY"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cells", hasSize(53)))
+                .andExpect(jsonPath("$.cells[0].key").value("2026-04-26-WEEK"))
+                .andExpect(jsonPath("$.cells[0].startDate").value("2026-05-01"))
+                .andExpect(jsonPath("$.cells[0].endDate").value("2026-05-02"))
+                .andExpect(jsonPath("$.cells[0].cellType").value("WEEK"))
+                .andExpect(jsonPath("$.cells[0].label").value("W1"))
+                .andExpect(jsonPath("$.cells[2].key").value("2026-05-10-WEEK"))
+                .andExpect(jsonPath("$.cells[2].isToday").value(true));
+    }
+
+    @Test
+    void yearHonoursMondayWeekStartWhenGeneratingWeekCells() throws Exception {
+        mockMvc.perform(get("/api/v1/dashboard/timeline")
+                        .param("view", "YEAR")
+                        .param("calendarYearBound", "false")
+                        .param("startOfWeek", "MONDAY"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cells", hasSize(53)))
+                .andExpect(jsonPath("$.cells[0].key").value("2026-04-27-WEEK"))
+                .andExpect(jsonPath("$.cells[0].startDate").value("2026-05-01"))
+                .andExpect(jsonPath("$.cells[0].endDate").value("2026-05-03"))
+                .andExpect(jsonPath("$.cells[0].cellType").value("WEEK"))
+                .andExpect(jsonPath("$.cells[0].label").value("W1"))
+                .andExpect(jsonPath("$.cells[2].key").value("2026-05-11-WEEK"))
+                .andExpect(jsonPath("$.cells[2].isToday").value(true));
+    }
+
+    @Test
+    void yearMapsOccurrencesIntoWeekBuckets() throws Exception {
+        mockMvc.perform(get("/api/v1/dashboard/timeline")
+                        .param("view", "YEAR")
+                        .param("calendarYearBound", "false")
+                        .param("startOfWeek", "SUNDAY"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[2].cellKey")
+                        .value("2026-05-10-WEEK"))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[2].totalOccurrences").value(3))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[2].completedOccurrences").value(1))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[2].completionLabel").value("1/3"))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[2].collapsedLabel").value("x3"))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[2].occurrences", hasSize(3)))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[3].cellKey")
+                        .value("2026-05-17-WEEK"))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[3].totalOccurrences").value(1))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[3].completedOccurrences").value(0))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[3].completionLabel").value("0/1"))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[3].collapsedLabel").value("x1"))
+                .andExpect(jsonPath("$.categories[0].tasks[0].buckets[3].occurrences", hasSize(1)));
     }
 
     @Test

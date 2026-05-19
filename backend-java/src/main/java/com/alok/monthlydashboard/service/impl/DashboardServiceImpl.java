@@ -90,11 +90,16 @@ public class DashboardServiceImpl implements DashboardService {
         if (view != TimelineView.MONTH
                 && view != TimelineView.QUARTER
                 && view != TimelineView.QUADRIMESTER
-                && view != TimelineView.HALF_YEAR) {
+                && view != TimelineView.HALF_YEAR
+                && view != TimelineView.YEAR) {
             throw new ValidationException("Timeline view " + view + " is not supported yet");
         }
 
         LocalDate today = appDateProvider.today();
+
+        if (view == TimelineView.YEAR) {
+            return getYearTimelineDashboard(today, startOfWeek, scaleNumbering, calendarYearBound);
+        }
 
         if (view == TimelineView.HALF_YEAR) {
             return getHalfYearTimelineDashboard(today, startOfWeek, scaleNumbering, calendarYearBound);
@@ -233,6 +238,43 @@ public class DashboardServiceImpl implements DashboardService {
 
         return new TimelineDashboardResponse(
                 TimelineView.HALF_YEAR,
+                dateRange.startDate().getYear(),
+                dateRange.startDate().getMonthValue(),
+                dateRange.startDate(),
+                dateRange.endDate(),
+                dateRange.label(),
+                today,
+                false,
+                settings,
+                buildTimelineScaleBar(dateRange.startDate(), dateRange.endDate(), cells, today),
+                cells,
+                buildTimelineCategoryResponses(dateRange.startDate(), dateRange.endDate(), cells)
+        );
+    }
+
+    private TimelineDashboardResponse getYearTimelineDashboard(
+            LocalDate today,
+            StartOfWeek startOfWeek,
+            ScaleNumbering scaleNumbering,
+            boolean calendarYearBound
+    ) {
+        TimelineDateRange dateRange = buildYearDateRange(today, calendarYearBound);
+        List<TimelineCellResponse> cells = buildWeekCells(
+                dateRange.startDate(),
+                dateRange.endDate(),
+                today,
+                startOfWeek
+        );
+
+        TimelineSettingsResponse settings = new TimelineSettingsResponse(
+                TimelineView.YEAR,
+                startOfWeek,
+                scaleNumbering,
+                calendarYearBound
+        );
+
+        return new TimelineDashboardResponse(
+                TimelineView.YEAR,
                 dateRange.startDate().getYear(),
                 dateRange.startDate().getMonthValue(),
                 dateRange.startDate(),
@@ -745,6 +787,28 @@ public class DashboardServiceImpl implements DashboardService {
                 startMonth.atDay(1),
                 endMonth.atEndOfMonth(),
                 "H" + (halfYearStartMonth == 1 ? "1" : "2") + " " + today.getYear()
+        );
+    }
+
+    private TimelineDateRange buildYearDateRange(LocalDate today, boolean calendarYearBound) {
+        YearMonth currentMonth = YearMonth.from(today);
+
+        if (!calendarYearBound) {
+            YearMonth endMonth = currentMonth.plusMonths(11);
+            return new TimelineDateRange(
+                    currentMonth.atDay(1),
+                    endMonth.atEndOfMonth(),
+                    buildRangeLabel(currentMonth, endMonth)
+            );
+        }
+
+        YearMonth startMonth = YearMonth.of(today.getYear(), 1);
+        YearMonth endMonth = YearMonth.of(today.getYear(), 12);
+
+        return new TimelineDateRange(
+                startMonth.atDay(1),
+                endMonth.atEndOfMonth(),
+                String.valueOf(today.getYear())
         );
     }
 
