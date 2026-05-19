@@ -89,11 +89,16 @@ public class DashboardServiceImpl implements DashboardService {
     ) {
         if (view != TimelineView.MONTH
                 && view != TimelineView.QUARTER
-                && view != TimelineView.QUADRIMESTER) {
+                && view != TimelineView.QUADRIMESTER
+                && view != TimelineView.HALF_YEAR) {
             throw new ValidationException("Timeline view " + view + " is not supported yet");
         }
 
         LocalDate today = appDateProvider.today();
+
+        if (view == TimelineView.HALF_YEAR) {
+            return getHalfYearTimelineDashboard(today, startOfWeek, scaleNumbering, calendarYearBound);
+        }
 
         if (view == TimelineView.QUADRIMESTER) {
             return getQuadrimesterTimelineDashboard(today, startOfWeek, scaleNumbering, calendarYearBound);
@@ -191,6 +196,43 @@ public class DashboardServiceImpl implements DashboardService {
 
         return new TimelineDashboardResponse(
                 TimelineView.QUADRIMESTER,
+                dateRange.startDate().getYear(),
+                dateRange.startDate().getMonthValue(),
+                dateRange.startDate(),
+                dateRange.endDate(),
+                dateRange.label(),
+                today,
+                false,
+                settings,
+                buildTimelineScaleBar(dateRange.startDate(), dateRange.endDate(), cells, today),
+                cells,
+                buildTimelineCategoryResponses(dateRange.startDate(), dateRange.endDate(), cells)
+        );
+    }
+
+    private TimelineDashboardResponse getHalfYearTimelineDashboard(
+            LocalDate today,
+            StartOfWeek startOfWeek,
+            ScaleNumbering scaleNumbering,
+            boolean calendarYearBound
+    ) {
+        TimelineDateRange dateRange = buildHalfYearDateRange(today, calendarYearBound);
+        List<TimelineCellResponse> cells = buildWeekCells(
+                dateRange.startDate(),
+                dateRange.endDate(),
+                today,
+                startOfWeek
+        );
+
+        TimelineSettingsResponse settings = new TimelineSettingsResponse(
+                TimelineView.HALF_YEAR,
+                startOfWeek,
+                scaleNumbering,
+                calendarYearBound
+        );
+
+        return new TimelineDashboardResponse(
+                TimelineView.HALF_YEAR,
                 dateRange.startDate().getYear(),
                 dateRange.startDate().getMonthValue(),
                 dateRange.startDate(),
@@ -473,6 +515,42 @@ public class DashboardServiceImpl implements DashboardService {
         return cells;
     }
 
+    private List<TimelineCellResponse> buildWeekCells(
+            LocalDate startDate,
+            LocalDate endDate,
+            LocalDate today,
+            StartOfWeek startOfWeek
+    ) {
+        List<TimelineCellResponse> cells = new ArrayList<>();
+        LocalDate weekStart = alignToWeekStart(startDate, startOfWeek);
+        int weekIndex = 1;
+
+        while (!weekStart.isAfter(endDate)) {
+            LocalDate weekEnd = weekStart.plusDays(6);
+            LocalDate cellStart = weekStart.isBefore(startDate) ? startDate : weekStart;
+            LocalDate cellEnd = weekEnd.isAfter(endDate) ? endDate : weekEnd;
+
+            cells.add(new TimelineCellResponse(
+                    bucketCellKey(weekStart, TimelineCellType.WEEK),
+                    cellStart,
+                    cellEnd,
+                    "W" + weekIndex,
+                    cellStart + " to " + cellEnd,
+                    TimelineCellType.WEEK,
+                    weekIndex,
+                    weekIndex,
+                    containsToday(cellStart, cellEnd, today, TimelineCellType.WEEK),
+                    containsWeekend(cellStart, cellEnd),
+                    true
+            ));
+
+            weekStart = weekStart.plusWeeks(1);
+            weekIndex++;
+        }
+
+        return cells;
+    }
+
     private List<TimelineCellResponse> buildWeekBucketCells(
             LocalDate startDate,
             LocalDate endDate,
@@ -581,6 +659,20 @@ public class DashboardServiceImpl implements DashboardService {
         return dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY;
     }
 
+    private boolean containsWeekend(LocalDate startDate, LocalDate endDate) {
+        LocalDate cursor = startDate;
+
+        while (!cursor.isAfter(endDate)) {
+            if (isWeekend(cursor.getDayOfWeek())) {
+                return true;
+            }
+
+            cursor = cursor.plusDays(1);
+        }
+
+        return false;
+    }
+
     private String buildMonthLabel(YearMonth targetMonth) {
         return targetMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH)
                 + " "
@@ -630,6 +722,29 @@ public class DashboardServiceImpl implements DashboardService {
                 startMonth.atDay(1),
                 endMonth.atEndOfMonth(),
                 "Quadrimester " + (((quadrimesterStartMonth - 1) / 4) + 1) + " " + today.getYear()
+        );
+    }
+
+    private TimelineDateRange buildHalfYearDateRange(LocalDate today, boolean calendarYearBound) {
+        YearMonth currentMonth = YearMonth.from(today);
+
+        if (!calendarYearBound) {
+            YearMonth endMonth = currentMonth.plusMonths(5);
+            return new TimelineDateRange(
+                    currentMonth.atDay(1),
+                    endMonth.atEndOfMonth(),
+                    buildRangeLabel(currentMonth, endMonth)
+            );
+        }
+
+        int halfYearStartMonth = today.getMonthValue() <= 6 ? 1 : 7;
+        YearMonth startMonth = YearMonth.of(today.getYear(), halfYearStartMonth);
+        YearMonth endMonth = startMonth.plusMonths(5);
+
+        return new TimelineDateRange(
+                startMonth.atDay(1),
+                endMonth.atEndOfMonth(),
+                "H" + (halfYearStartMonth == 1 ? "1" : "2") + " " + today.getYear()
         );
     }
 
