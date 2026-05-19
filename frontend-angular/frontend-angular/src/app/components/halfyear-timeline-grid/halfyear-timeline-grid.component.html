@@ -1,0 +1,86 @@
+@if (dashboard; as halfyear) {
+<div class="halfyear-header">
+  <div>
+    <h3>{{ halfyear.label }}</h3>
+    <p>{{ halfyear.startDate }} to {{ halfyear.endDate }} · weekly occurrence buckets</p>
+  </div>
+
+  <div class="halfyear-readonly-badge">
+    <strong>Read-only</strong>
+    <span>Completion changes stay in Month View</span>
+  </div>
+</div>
+
+@if (categories.length === 0) {
+<div class="empty-halfyear-state">
+  <strong>No HalfYear task occurrences yet.</strong>
+  <p>Tasks with generated occurrences in this HalfYear will appear here.</p>
+</div>
+} @else {
+<div
+  class="halfyear-grid"
+  [style.grid-template-columns]="gridTemplateColumns">
+  <div class="halfyear-grid-heading">Task Grid</div>
+
+  @for (cell of halfyear.cells; track cell.key) {
+  <div
+    class="halfyear-cell-heading"
+    [class.today]="cell.isToday"
+    [title]="weekRangeLabel(cell)">
+    <span>{{ cell.label }}</span>
+    <small>Week</small>
+  </div>
+  }
+
+  @for (category of categories; track category.categoryId) {
+  <div class="halfyear-category-row">
+    <span
+      class="category-color-chip"
+      [style.background]="category.categoryColor">
+    </span>
+    {{ category.categoryName }}
+  </div>
+
+  @for (cell of halfyear.cells; track cell.key) {
+  <div class="halfyear-category-spacer"></div>
+  }
+
+  @for (task of category.tasks; track task.taskId) {
+  <div
+    class="halfyear-task-name"
+    [class.no-visible-occurrences]="!hasOccurrences(task)">
+    <strong>{{ task.taskName }}</strong>
+    @if (hasOccurrences(task)) {
+    <span>{{ task.recurrenceSummary }}</span>
+    } @else {
+    <span>No generated occurrences in this visible HalfYear</span>
+    }
+  </div>
+
+  @for (cell of halfyear.cells; track cell.key) {
+  @if (bucketForCell(task, cell); as bucket) {
+  <div
+    class="halfyear-bucket"
+    [class.has-occurrences]="bucket.totalOccurrences > 0"
+    [class.completed]="bucket.totalOccurrences > 0 && bucket.completedOccurrences === bucket.totalOccurrences"
+    [title]="bucketAccessibleLabel(bucket, cell)"
+    [attr.aria-label]="bucketAccessibleLabel(bucket, cell)">
+    @if (bucket.totalOccurrences > 0) {
+    <span class="bucket-count">{{ bucket.completionLabel }}</span>
+    <small>{{ bucketDetailLabel(bucket) }}</small>
+    }
+  </div>
+  } @else {
+  <div class="halfyear-bucket"></div>
+  }
+  }
+  }
+  }
+</div>
+}
+} @else {
+<div class="empty-halfyear-state">
+  <strong>HalfYear timeline not loaded.</strong>
+  <p>Select HalfYear again or reload the dashboard.</p>
+</div>
+}

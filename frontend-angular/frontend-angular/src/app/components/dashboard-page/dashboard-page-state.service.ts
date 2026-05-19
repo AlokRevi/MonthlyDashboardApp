@@ -35,6 +35,7 @@ export class DashboardPageStateService {
   monthTimelineDashboard = signal<TimelineDashboardResponse | null>(null);
   quarterTimelineDashboard = signal<TimelineDashboardResponse | null>(null);
   quadrimesterTimelineDashboard = signal<TimelineDashboardResponse | null>(null);
+  halfyearTimelineDashboard = signal<TimelineDashboardResponse | null>(null);
   checklist = signal<TodayChecklistResponse | null>(null);
   availableCategories = signal<CategoryResponse[]>([]);
 
@@ -43,6 +44,8 @@ export class DashboardPageStateService {
   quarterTimelineError = signal('');
   quadrimesterTimelineLoading = signal(false);
   quadrimesterTimelineError = signal('');
+  halfyearTimelineLoading = signal(false);
+  halfyearTimelineError = signal('');
   errorMessage = signal('');
   successMessage = signal('');
   taskSaving = signal(false);
@@ -83,6 +86,11 @@ export class DashboardPageStateService {
 
   visibleQuadrimesterCategories = computed(() =>
     this.quadrimesterTimelineDashboard()?.categories
+      .filter(category => category.tasks.length > 0) ?? []
+  );
+
+  visibleHalfyearCategories = computed(() =>
+    this.halfyearTimelineDashboard()?.categories
       .filter(category => category.tasks.length > 0) ?? []
   );
 
@@ -142,6 +150,10 @@ export class DashboardPageStateService {
 
     if (view === 'QUADRIMESTER') {
       this.loadQuadrimesterTimelineDashboard();
+    }
+
+    if (view === 'HALF_YEAR') {
+      this.loadHalfyearTimelineDashboard();
     }
   }
 
@@ -205,6 +217,24 @@ export class DashboardPageStateService {
     });
   }
 
+  loadHalfyearTimelineDashboard(): void {
+    this.halfyearTimelineLoading.set(true);
+    this.halfyearTimelineError.set('');
+
+    this.dashboardApi.getTimelineDashboard('HALF_YEAR', this.viewSettings()).subscribe({
+      next: (dashboard) => {
+        this.halfyearTimelineDashboard.set(dashboard);
+        this.halfyearTimelineLoading.set(false);
+      },
+      error: (error) => {
+        console.error('HalfYear timeline load failed:', error);
+        this.halfyearTimelineDashboard.set(null);
+        this.halfyearTimelineLoading.set(false);
+        this.halfyearTimelineError.set('Could not load HalfYear timeline.');
+      }
+    });
+  }
+
   goToPreviousMonth(): void {
     if (this.selectedMonth() === 1) {
       this.selectedMonth.set(12);
@@ -223,6 +253,10 @@ export class DashboardPageStateService {
 
     if (this.viewSettings().view === 'QUADRIMESTER') {
       this.loadQuadrimesterTimelineDashboard();
+    }
+
+    if (this.viewSettings().view === 'HALF_YEAR') {
+      this.loadHalfyearTimelineDashboard();
     }
   }
 

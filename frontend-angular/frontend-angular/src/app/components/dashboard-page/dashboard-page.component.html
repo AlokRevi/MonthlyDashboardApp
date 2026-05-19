@@ -319,10 +319,28 @@
           </div>
           }
         </section>
+        } @else if (state.viewSettings().view === 'HALF_YEAR') {
+        <section class="quarter-timeline-panel">
+          @if (state.halfyearTimelineLoading()) {
+          <p class="loading">Loading HalfYear timeline...</p>
+          } @else if (state.halfyearTimelineError()) {
+          <p class="error">{{ state.halfyearTimelineError() }}</p>
+          } @else if (state.halfyearTimelineDashboard(); as halfyear) {
+          <app-halfyear-timeline-grid
+            [dashboard]="halfyear"
+            [categories]="state.visibleHalfyearCategories()">
+          </app-halfyear-timeline-grid>
+          } @else {
+          <div class="empty-dashboard-state">
+            <strong>HalfYear timeline not loaded.</strong>
+            <p>Select HalfYear again or reload the dashboard.</p>
+          </div>
+          }
+        </section>
         } @else {
         <div class="empty-dashboard-state">
           <strong>{{ state.viewSettings().view }} is not available yet.</strong>
-          <p>Only Month, Quarter, and Quadrimester are wired in this frontend branch.</p>
+          <p>Only Month, Quarter, Quadrimester, and HalfYear are wired in this frontend branch.</p>
         </div>
         }
       </div>
