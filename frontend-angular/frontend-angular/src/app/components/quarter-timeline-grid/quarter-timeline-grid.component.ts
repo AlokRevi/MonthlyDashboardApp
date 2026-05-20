@@ -8,6 +8,11 @@ import {
   TimelineOccurrenceBucketResponse,
   TimelineTaskResponse
 } from '../../models/dashboard.models';
+import {
+  bucketAccessibleLabel,
+  bucketForCell,
+  hasOccurrences
+} from '../timeline-grid/timeline-grid.helpers';
 
 @Component({
   selector: 'app-quarter-timeline-grid',
@@ -29,11 +34,11 @@ export class QuarterTimelineGridComponent {
     task: TimelineTaskResponse,
     cell: TimelineCellResponse
   ): TimelineOccurrenceBucketResponse | null {
-    return task.buckets.find(bucket => bucket.cellKey === cell.key) ?? null;
+    return bucketForCell(task, cell);
   }
 
   hasOccurrences(task: TimelineTaskResponse): boolean {
-    return task.buckets.some(bucket => bucket.totalOccurrences > 0);
+    return hasOccurrences(task);
   }
 
   cellBucketLabel(cell: TimelineCellResponse): string {
@@ -52,12 +57,6 @@ export class QuarterTimelineGridComponent {
     bucket: TimelineOccurrenceBucketResponse,
     cell: TimelineCellResponse
   ): string {
-    const total = bucket.totalOccurrences;
-
-    if (total === 0) {
-      return `No generated occurrences from ${cell.startDate} to ${cell.endDate}`;
-    }
-
-    return `${bucket.completedOccurrences} completed of ${total} generated occurrences from ${cell.startDate} to ${cell.endDate}`;
+    return bucketAccessibleLabel(bucket, cell);
   }
 }

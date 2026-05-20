@@ -8,6 +8,13 @@ import {
   TimelineOccurrenceBucketResponse,
   TimelineTaskResponse
 } from '../../models/dashboard.models';
+import {
+  bucketAccessibleLabel,
+  bucketForCell,
+  dateRangeLabel,
+  generatedCountLabel,
+  hasOccurrences
+} from '../timeline-grid/timeline-grid.helpers';
 
 @Component({
   selector: 'app-quadrimester-timeline-grid',
@@ -29,11 +36,11 @@ export class QuadrimesterTimelineGridComponent {
     task: TimelineTaskResponse,
     cell: TimelineCellResponse
   ): TimelineOccurrenceBucketResponse | null {
-    return task.buckets.find(bucket => bucket.cellKey === cell.key) ?? null;
+    return bucketForCell(task, cell);
   }
 
   hasOccurrences(task: TimelineTaskResponse): boolean {
-    return task.buckets.some(bucket => bucket.totalOccurrences > 0);
+    return hasOccurrences(task);
   }
 
   cellBucketLabel(cell: TimelineCellResponse): string {
@@ -57,31 +64,17 @@ export class QuadrimesterTimelineGridComponent {
       return 'Sat-Sun';
     }
 
-    return cell.startDate === cell.endDate
-      ? cell.startDate
-      : `${cell.startDate} to ${cell.endDate}`;
+    return dateRangeLabel(cell);
   }
 
   bucketDetailLabel(bucket: TimelineOccurrenceBucketResponse): string {
-    const total = bucket.totalOccurrences;
-
-    if (total === 1) {
-      return '1 generated';
-    }
-
-    return `${total} generated`;
+    return generatedCountLabel(bucket);
   }
 
   bucketAccessibleLabel(
     bucket: TimelineOccurrenceBucketResponse,
     cell: TimelineCellResponse
   ): string {
-    const total = bucket.totalOccurrences;
-
-    if (total === 0) {
-      return `No generated occurrences from ${cell.startDate} to ${cell.endDate}`;
-    }
-
-    return `${bucket.completedOccurrences} completed of ${total} generated occurrences from ${cell.startDate} to ${cell.endDate}`;
+    return bucketAccessibleLabel(bucket, cell);
   }
 }
