@@ -337,10 +337,28 @@
           </div>
           }
         </section>
+        } @else if (state.viewSettings().view === 'YEAR') {
+        <section class="quarter-timeline-panel">
+          @if (state.yearTimelineLoading()) {
+          <p class="loading">Loading Year timeline...</p>
+          } @else if (state.yearTimelineError()) {
+          <p class="error">{{ state.yearTimelineError() }}</p>
+          } @else if (state.yearTimelineDashboard(); as year) {
+          <app-year-timeline-grid
+            [dashboard]="year"
+            [categories]="state.visibleYearCategories()">
+          </app-year-timeline-grid>
+          } @else {
+          <div class="empty-dashboard-state">
+            <strong>Year timeline not loaded.</strong>
+            <p>Select Year again or reload the dashboard.</p>
+          </div>
+          }
+        </section>
         } @else {
         <div class="empty-dashboard-state">
           <strong>{{ state.viewSettings().view }} is not available yet.</strong>
-          <p>Only Month, Quarter, Quadrimester, and HalfYear are wired in this frontend branch.</p>
+          <p>Only Month, Quarter, Quadrimester, HalfYear, and Year are wired in this frontend branch.</p>
         </div>
         }
       </div>

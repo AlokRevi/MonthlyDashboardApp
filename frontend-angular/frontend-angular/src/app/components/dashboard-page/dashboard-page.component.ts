@@ -17,6 +17,7 @@ import { CategoryCreateDialogComponent } from '../category-create-dialog/categor
 import { QuarterTimelineGridComponent } from '../quarter-timeline-grid/quarter-timeline-grid.component';
 import { QuadrimesterTimelineGridComponent } from '../quadrimester-timeline-grid/quadrimester-timeline-grid.component';
 import { HalfyearTimelineGridComponent } from '../halfyear-timeline-grid/halfyear-timeline-grid.component';
+import { YearTimelineGridComponent } from '../year-timeline-grid/year-timeline-grid.component';
 import {
   INTERVAL_UNIT_OPTIONS,
   MONTH_OPTIONS,
@@ -57,7 +58,8 @@ interface ViewSettingOption<TValue extends string> {
     MonthNavigationComponent,
     QuarterTimelineGridComponent,
     QuadrimesterTimelineGridComponent,
-    HalfyearTimelineGridComponent
+    HalfyearTimelineGridComponent,
+    YearTimelineGridComponent
   ],
   templateUrl: './dashboard-page.component.html',
   styleUrl: './dashboard-page.component.css',

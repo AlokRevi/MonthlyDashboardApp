@@ -36,6 +36,7 @@ export class DashboardPageStateService {
   quarterTimelineDashboard = signal<TimelineDashboardResponse | null>(null);
   quadrimesterTimelineDashboard = signal<TimelineDashboardResponse | null>(null);
   halfyearTimelineDashboard = signal<TimelineDashboardResponse | null>(null);
+  yearTimelineDashboard = signal<TimelineDashboardResponse | null>(null);
   checklist = signal<TodayChecklistResponse | null>(null);
   availableCategories = signal<CategoryResponse[]>([]);
 
@@ -46,6 +47,8 @@ export class DashboardPageStateService {
   quadrimesterTimelineError = signal('');
   halfyearTimelineLoading = signal(false);
   halfyearTimelineError = signal('');
+  yearTimelineLoading = signal(false);
+  yearTimelineError = signal('');
   errorMessage = signal('');
   successMessage = signal('');
   taskSaving = signal(false);
@@ -91,6 +94,11 @@ export class DashboardPageStateService {
 
   visibleHalfyearCategories = computed(() =>
     this.halfyearTimelineDashboard()?.categories
+      .filter(category => category.tasks.length > 0) ?? []
+  );
+
+  visibleYearCategories = computed(() =>
+    this.yearTimelineDashboard()?.categories
       .filter(category => category.tasks.length > 0) ?? []
   );
 
@@ -154,6 +162,10 @@ export class DashboardPageStateService {
 
     if (view === 'HALF_YEAR') {
       this.loadHalfyearTimelineDashboard();
+    }
+
+    if (view === 'YEAR') {
+      this.loadYearTimelineDashboard();
     }
   }
 
@@ -235,6 +247,24 @@ export class DashboardPageStateService {
     });
   }
 
+  loadYearTimelineDashboard(): void {
+    this.yearTimelineLoading.set(true);
+    this.yearTimelineError.set('');
+
+    this.dashboardApi.getTimelineDashboard('YEAR', this.viewSettings()).subscribe({
+      next: (dashboard) => {
+        this.yearTimelineDashboard.set(dashboard);
+        this.yearTimelineLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Year timeline load failed:', error);
+        this.yearTimelineDashboard.set(null);
+        this.yearTimelineLoading.set(false);
+        this.yearTimelineError.set('Could not load Year timeline.');
+      }
+    });
+  }
+
   goToPreviousMonth(): void {
     if (this.selectedMonth() === 1) {
       this.selectedMonth.set(12);
@@ -257,6 +287,10 @@ export class DashboardPageStateService {
 
     if (this.viewSettings().view === 'HALF_YEAR') {
       this.loadHalfyearTimelineDashboard();
+    }
+
+    if (this.viewSettings().view === 'YEAR') {
+      this.loadYearTimelineDashboard();
     }
   }
 
