@@ -22,7 +22,7 @@ export class YearTimelineGridComponent {
   @Input() categories: TimelineCategoryResponse[] = [];
 
   get gridTemplateColumns(): string {
-    return `240px repeat(${this.dashboard?.cells.length ?? 0}, 58px)`;
+    return `240px repeat(${this.dashboard?.cells.length ?? 0}, 60px)`;
   }
 
   bucketForCell(
@@ -46,14 +46,14 @@ export class YearTimelineGridComponent {
     return `${this.shortDate(cell.startDate)}-${this.shortDate(cell.endDate)}`;
   }
 
+  weekPositionLabel(cell: TimelineCellResponse): string {
+    return `${cell.segmentIndex} of ${this.dashboard?.cells.length ?? 0}`;
+  }
+
   bucketDetailLabel(bucket: TimelineOccurrenceBucketResponse): string {
     const total = bucket.totalOccurrences;
 
-    if (total === 1) {
-      return '1 generated';
-    }
-
-    return `${total} generated`;
+    return `${bucket.completedOccurrences} done of ${total}`;
   }
 
   bucketAccessibleLabel(

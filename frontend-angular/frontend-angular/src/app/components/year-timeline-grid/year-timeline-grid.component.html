@@ -2,19 +2,19 @@
 <div class="year-header">
   <div>
     <h3>{{ year.label }}</h3>
-    <p>{{ year.startDate }} to {{ year.endDate }} · weekly generated occurrence summary</p>
+    <p>{{ year.startDate }} to {{ year.endDate }} · {{ year.cells.length }} weekly cells</p>
   </div>
 
   <div class="year-readonly-badge">
-    <strong>Read-only</strong>
-    <span>Completion changes stay in Month View</span>
+    <strong>Read-only Year View</strong>
+    <span>Review weekly totals here. Complete tasks in Month View.</span>
   </div>
 </div>
 
 @if (categories.length === 0) {
 <div class="empty-year-state">
-  <strong>No Year task occurrences yet.</strong>
-  <p>Tasks with generated occurrences in this Year will appear here.</p>
+  <strong>No task occurrences in this Year range.</strong>
+  <p>Tasks with generated occurrences between {{ year.startDate }} and {{ year.endDate }} will appear here.</p>
 </div>
 } @else {
 <div
@@ -28,7 +28,7 @@
     [class.today]="cell.isToday"
     [title]="weekRangeLabel(cell)">
     <span>{{ cell.label }}</span>
-    <small>Week</small>
+    <small>Week {{ weekPositionLabel(cell) }}</small>
     <em>{{ weekShortRangeLabel(cell) }}</em>
   </div>
   }
@@ -54,7 +54,7 @@
     @if (hasOccurrences(task)) {
     <span>{{ task.recurrenceSummary }}</span>
     } @else {
-    <span>No generated occurrences in this visible year</span>
+    <span>No generated occurrences in this visible Year range</span>
     }
   </div>
 
